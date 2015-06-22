@@ -371,7 +371,7 @@ vector<vector<int>> FindQualifiedPaths(vector<vector<int>> graph, int vertex_num
 										path_index.push_back(1);
 										break;
 									}
-								}
+								} 
 							}
 
 						}
@@ -397,7 +397,7 @@ vector<vector<int>> FindQualifiedPaths(vector<vector<int>> graph, int vertex_num
 
 	//Without spatial constraint we use another function which implements the nonspatial constraint search
 	if (constraint_rect.size() == 0)
-	{
+	{ 
 		Paths = FindQualifiedPaths(graph, vertex_num, step_num, vector_edge_type);
 		return Paths;
 	}

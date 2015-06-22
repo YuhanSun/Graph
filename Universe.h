@@ -4,6 +4,7 @@
 #include <fstream>
 using namespace std;
 #include <vector>
+#include <set>
 #include <stack>
 #include "Rand.h"
 #include "RTree.h"
@@ -25,6 +26,7 @@ struct Entity
 	bool IsSpatial;
 	Location location;
 	int type;
+	MyRect RMBR;
 };
 
 struct Rect
@@ -54,20 +56,32 @@ struct edge
 bool MySearchCallback(int id, void* arg);
 
 vector<int> GetHitID();
+void ResetHitID(int size);
+
+int GetStartTime();
+void SetStartTime(int i);
+
+int GetRunTime();
+void SetRunTime(int i);
 
 //Judge whether a location is in a specific rectangle
 bool Location_In_Rect(Location m_location, MyRect m_rect);
 
 //Outfile entity to disk for storage
 void EntityToDisk(Entity Entity_Matrix[], int node_count, int range, string filename);
+void EntityToDIsk(vector<Entity> entity_vector, int range, string filename);
 
 //Out file entity to disk for displaying
 void OutFile(Entity Entity_Matrix[], int node_count, string filename);
+void OutFile(vector<Entity> entity_vector, string filename);
 
 //Generate entity with specific spatial entity ratio
 void GenerateEntity(int node_count, Entity Entity_Matrix[], int range, double nonspatial_entity_ratio);
+void GenerateEntity(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio);
+
 
 //Read entity from disk storage
 void ReadEntityFromDisk(int &node_count, Entity Entity_Matrix[], int &range,string filename);
+void ReadEntityFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
 
 #endif

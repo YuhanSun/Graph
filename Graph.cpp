@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Graph.h"
 int count = 0;
-int m_node_count = 0;
 /* Function to create an adjacency list node*/
 adjlist_node_p createNode(int v, int edge_type)
 {
@@ -577,7 +576,7 @@ vector<vector<adjlist_node_p>> FindQualifiedPaths_from_specific_entity_type(grap
 	vector<vector<adjlist_node_p>> vector_Paths;
 	::count = 0;
 
-	for (int entity_id = 0; entity_id < m_node_count; entity_id++)
+	for (int entity_id = 0; entity_id < graph->num_vertices; entity_id++)
 	{
 		if (entity_matrix[entity_id].type == start_entity_type)
 		{

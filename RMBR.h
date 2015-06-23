@@ -18,13 +18,14 @@ bool ReachabilityQuery(vector<Entity> &entity,vector<vector<int>> &graph, int st
 //for transitive closure testing
 void Traverse(int id, vector<vector<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices);
 vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Entity> &entity);
-vector<vector<int>> GetTransitiveClosureDynamic(vector<set<int>> &graph, vector<Entity> &entity);
+vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &graph, vector<Entity> &entity);
 vector<MyRect> GetRMBRFromTransitiveClosure(vector<vector<int>> &transitive_closure, vector<Entity> &entity);
 vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity);
 
 void ReadTransitiveClosure(vector<vector<int>> &transitive_closure, int &node_count, int &range, string filename);
 
 void TransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename);
+void TransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynamic, int range, string filename);
 void SpatialTransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename, vector<Entity> p_entity);
 void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, vector<Entity> p_entity);
 

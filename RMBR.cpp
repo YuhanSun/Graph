@@ -159,7 +159,7 @@ bool ReachabilityQuery(vector<Entity> &entity, vector<vector<int>> &graph, int s
 }
 
 ////for transitive closure testing
-vector<vector<int>> GetTranstiveiClosure(vector<vector<int>> &graph, vector<Entity> &entity)
+vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Entity> &entity)
 {
 	int node_count = entity.size();
 
@@ -172,12 +172,6 @@ vector<vector<int>> GetTranstiveiClosure(vector<vector<int>> &graph, vector<Enti
 	{
 		for (int j = 0; j < node_count; j++)
 			isvisited[j] = false;
-		
-		if (i == 1000)
-			MessageBox(NULL,_T("1000"), _T("Error"), MB_OK);
-
-		if (i == 10000)
-			MessageBox(NULL, _T("10000"), _T("Error"), MB_OK);
 
 		transitive_closure[i].reserve(20);
 		Traverse(i, graph, isvisited,transitive_closure[i]);
@@ -193,6 +187,17 @@ vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vecto
 	vector<set<int>> transitive_closure;
 	transitive_closure.resize(p_node_count);
 
+	for (int i = 0; i < p_graph.size(); i++)
+	{
+		for (int j = 0; j < p_graph[i].size() / 2; j++)
+		{			
+			int k = 2 * j + 1;
+			int neibour_id = p_graph[i][k];
+
+			transitive_closure[i].insert(neibour_id);
+		}
+	}
+
 	bool changed = true;
 
 	while (changed)
@@ -207,17 +212,20 @@ vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vecto
 
 				set<int>::iterator iter = transitive_closure[neibour_id].begin();
 				set<int>::iterator end = transitive_closure[neibour_id].end();
+
 				for (; iter != end; iter++)
 				{
-					if (transitive_closure[i].find(*iter)!=end)
+					int reach_node = *iter;
+					if (transitive_closure[i].find(reach_node) == transitive_closure[i].end())
 					{
 						changed = true;
-						transitive_closure[i].insert(*iter);
+						transitive_closure[i].insert(reach_node);
 					}
 				}
 			}
 		}
 	}
+	return transitive_closure;
 }
 
 vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity)
@@ -341,6 +349,28 @@ void TransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int rang
 	}
 	fclose(stdout);
 }
+
+void TransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynamic, int range, string filename)
+{
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "w", stdout);
+
+	printf("%d %d\n", transitive_closure_dynamic.size(), range);
+	for (int i = 0; i < transitive_closure_dynamic.size(); i++)
+	{
+		printf("%d %d ", i, transitive_closure_dynamic[i].size());
+		set<int>::iterator end = transitive_closure_dynamic[i].end();
+		for (set<int>::iterator iter = transitive_closure_dynamic[i].begin(); iter != end; iter++)
+		{
+			printf("%d ", *iter);
+		}
+		printf("\n");
+	}
+	fclose(stdout);
+}
+
 
 void SpatialTransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename, vector<Entity> p_entity)
 {

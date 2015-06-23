@@ -450,6 +450,8 @@ void Generate_Vector(vector<vector<int>> &graph, int node_count, __int64 edge_co
 
 void Generate_Vector_Noback(vector<vector<int>> &graph, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio)
 {
+	::edge_count = 0;
+
 	int k = log2(node_count);
 	node_count = pow(2, k);
 

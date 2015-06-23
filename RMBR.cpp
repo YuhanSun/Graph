@@ -203,19 +203,22 @@ vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vecto
 	while (changed)
 	{
 		changed = false;
-		for (int i = 0; i < p_entity.size(); i++)
+
+		for (int i = 0; i < p_graph.size(); i++)
 		{
-			for (int j = 0; j < p_graph[i].size() / 2; j++)
+			set<int>::iterator iter_line = transitive_closure[i].begin();
+			set<int>::iterator end_line = transitive_closure[i].end();
+
+			for (; iter_line != end_line; iter_line++)
 			{
-				int k = 2 * j + 1;
-				int neibour_id = p_graph[i][k];
+				int neighbor = *iter_line;
 
-				set<int>::iterator iter = transitive_closure[neibour_id].begin();
-				set<int>::iterator end = transitive_closure[neibour_id].end();
+				set<int>::iterator iter_neighbor = transitive_closure[neighbor].begin();
+				set<int>::iterator end_neighbor = transitive_closure[neighbor].end();
 
-				for (; iter != end; iter++)
+				for (; iter_neighbor != end_neighbor; iter_neighbor++)
 				{
-					int reach_node = *iter;
+					int reach_node = *iter_neighbor;
 					if (transitive_closure[i].find(reach_node) == transitive_closure[i].end())
 					{
 						changed = true;

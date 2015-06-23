@@ -6,8 +6,10 @@ using namespace std;
 #include <vector>
 #include <set>
 #include <stack>
+#include <queue>
 #include "Rand.h"
 #include "RTree.h"
+#include <iterator>
 
 struct Location
 {

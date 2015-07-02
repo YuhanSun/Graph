@@ -464,9 +464,10 @@ void Generate_Vector_Noback(vector<vector<int>> &graph, int node_count, __int64 
 
 	TRnd Rnd = time(0);
 
-	for (INT64 m = 0; m < edge_count; m++)
+	for (INT64 m = 0; ; m++)
 	{
-
+		if (::edge_count == edge_count)
+			break;
 		int i = 0, j = 0;
 		for (INT64 t = 0; t < k; t++)
 		{
@@ -507,6 +508,75 @@ void Generate_Vector_Noback(vector<vector<int>> &graph, int node_count, __int64 
 		if (i >= node_count*nonspatial_entity_ratio && j < node_count*nonspatial_entity_ratio)
 		{
 			addvector(graph, i, j, 4);
+		}
+	}
+}
+
+void Generate_Vector_Noback_In_Edge(vector<vector<int>> &graph_outedge, vector<vector<int>> &graph_inedge, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio)
+{
+	::edge_count = 0;
+
+	int k = log2(node_count);
+	node_count = pow(2, k);
+
+	graph_outedge.resize(node_count);
+	graph_inedge.resize(node_count);
+	int ratio = edge_count / node_count;
+	for (int i = 0; i < node_count; i++)
+	{
+		graph_outedge[i].reserve(ratio * 6);
+		graph_inedge[i].reserve(ratio * 6);
+	}
+
+	TRnd Rnd = time(0);
+
+	for (INT64 m = 0; m < edge_count; m++)
+	{
+
+		int i = 0, j = 0;
+		for (INT64 t = 0; t < k; t++)
+		{
+			double prob = Rnd.GetUniDev();
+			if (prob >= a&&prob < (a + b))
+				j = j + pow(2, k - 1 - t);
+			else
+			{
+				if (prob >= (a + b) && prob < (a + b + c))
+				{
+					i = i + pow(2, k - 1 - t);
+				}
+				else
+				{
+					if (prob >= (a + b + c))
+					{
+						i = i + pow(2, k - 1 - t);
+						j = j + pow(2, k - 1 - t);
+					}
+				}
+			}
+		}
+		if (i == j)
+			continue;
+		::edge_count += 1;
+		if (i < node_count*nonspatial_entity_ratio && j < node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph_outedge, i, j, 0);
+			addvector(graph_inedge, j, i, 0);
+		}
+		if (i < node_count*nonspatial_entity_ratio && j >= node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph_outedge, i, j, 2);
+			addvector(graph_inedge, j, i, 2);
+		}
+		if (i >= node_count*nonspatial_entity_ratio && j >= node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph_outedge, i, j, 6);
+			addvector(graph_inedge, j, i, 6);
+		}
+		if (i >= node_count*nonspatial_entity_ratio && j < node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph_outedge, i, j, 4);
+			addvector(graph_inedge, j, i, 4);
 		}
 	}
 }

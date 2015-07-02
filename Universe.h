@@ -5,6 +5,7 @@
 using namespace std;
 #include <vector>
 #include <set>
+#include <hash_set>
 #include <stack>
 #include <queue>
 #include "Rand.h"

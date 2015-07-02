@@ -18,6 +18,7 @@ vector<vector<int>> ReadVectorFromDisk(string filename);
 void addvector(vector<vector<int>> &graph, int start, int dest, int edge_type);
 void Generate_Vector(vector<vector<int>> &graph, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio);
 void Generate_Vector_Noback(vector<vector<int>> &graph, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio);//for testing RMBR
+void Generate_Vector_Noback_In_Edge(vector<vector<int>> &graph_outedge, vector<vector<int>> &graph_inedge, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio);
 void OutFile(vector<vector<int>> graph, string filename);
 
 

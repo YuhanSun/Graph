@@ -161,7 +161,7 @@ bool ReachabilityQuery(vector<Entity> &entity, vector<vector<int>> &graph, int s
 ////for transitive closure testing
 vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Entity> &entity)
 {
-	int node_count = entity.size();
+	int node_count = graph.size();
 
 	vector<bool> isvisited;
 	isvisited.resize(node_count);
@@ -173,7 +173,7 @@ vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Enti
 		for (int j = 0; j < node_count; j++)
 			isvisited[j] = false;
 
-		transitive_closure[i].reserve(20);
+		transitive_closure[i].reserve(10);
 		Traverse(i, graph, isvisited,transitive_closure[i]);
 	}
 
@@ -182,7 +182,7 @@ vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Enti
 
 vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph, vector<Entity> &p_entity)
 {
-	int p_node_count = p_entity.size();
+	int p_node_count = p_graph.size();
 
 	vector<set<int>> transitive_closure;
 	transitive_closure.resize(p_node_count);
@@ -233,7 +233,7 @@ vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph
 
 vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vector<Entity> &p_entity)
 {
-	int p_node_count = p_entity.size();
+	int p_node_count = p_graph.size();
 
 	vector<hash_set<int>> transitive_closure;
 	transitive_closure.resize(p_node_count);
@@ -359,7 +359,7 @@ vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &graph_outedge,
 
 vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity)
 {
-	int node_count = entity.size();
+	int node_count = graph.size();
 	vector<bool> isvisited;
 	isvisited.resize(node_count);
 
@@ -587,7 +587,7 @@ void SpatialTransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closur
 }
 
 
-void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, vector<Entity> p_entity)
+void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, int node_count, double nonspatial_ratio)
 {
 	string root = "data/";
 	root += filename;
@@ -598,7 +598,7 @@ void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, 
 	for (int j = 0; j < transitive_closure_line.size(); j++)
 	{
 		int id = transitive_closure_line[j];
-		if (p_entity[id].IsSpatial)
+		if (node_count*nonspatial_ratio >= id)
 			count++;
 	}
 	printf("%d %d ", id, count);
@@ -606,7 +606,7 @@ void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, 
 	for (int j = 0; j < transitive_closure_line.size(); j++)
 	{
 		int id = transitive_closure_line[j];
-		if (p_entity[id].IsSpatial)
+		if (node_count*nonspatial_ratio >= id)
 			printf("%d ", id);
 	}
 

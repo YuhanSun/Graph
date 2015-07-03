@@ -31,7 +31,7 @@ void TransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynam
 void TransitiveClosureDynamic_To_Disk(vector<hash_set<int>> &transitive_closure_dynamic, int range, string filename);
 void SpatialTransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynamic, int range, string filename, vector<Entity> p_entity);
 void SpatialTransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename, vector<Entity> p_entity);
-void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, vector<Entity> p_entity);
+void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, int node_count, double nonspatial_ratio);
 
 void TransitiveClosureRMBR_To_Disk(vector<MyRect> RMBR, int range, string filename);
 

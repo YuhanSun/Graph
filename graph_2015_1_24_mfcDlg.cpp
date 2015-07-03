@@ -21,6 +21,7 @@ vector<vector<int>> graph_inedge_v;
 vector<Entity> m_entity;
 int m_range;
 int m_node_count;
+int m_edge_count;
 double m_nonspatial_ratio = 0.2;
 
 typedef RTree<int, double, 2, double> MyTree;
@@ -250,150 +251,48 @@ HCURSOR Cgraph_2015_1_24_mfcDlg::OnQueryDragIcon()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedtest()
 {
-	// TODO: Add your control notification handler code here
+	graph_v.clear();
+	m_node_count = pow(2, 20);
+	m_edge_count = 1 * m_node_count;
+	m_nonspatial_ratio = 0.4;
+	Generate_Random_Vector(graph_v, m_node_count, m_edge_count, m_nonspatial_ratio);
+	//Generate_Random_DAG(graph_v, m_node_count, m_edge_count, m_nonspatial_ratio);
+	VectorToDisk(graph_v, "RMBR/Random/graph_20.txt");
 
-	ofstream filetime("data/size/time.txt");
-	ofstream fileaverage("data/size/average_time.txt");
-	filetime << "start_node_id " << "paths_count " << "time" << endl;
-	fileaverage << "node_count " << "average_paths_count " << "average_time" << endl;
+	string path = "RMBR/Random/";
+	string root = "data/";
+	root += path + "spatial_transitive_closure.txt";
+	char *ch = (char *)root.data();
+	freopen(ch, "w", stdout);
+	printf("%d %d\n", m_node_count, m_range);
+	fclose(stdout);
 
-	vector<int> edge_type;
-	edge_type.push_back(0);
-	edge_type.push_back(2);
-	edge_type.push_back(4);
-
-	vector<bool> constraint_step;
-	constraint_step.resize(4);
-	constraint_step[0] = false;
-	constraint_step[1] = false;
-	constraint_step[2] = true;
-	constraint_step[3] = false;
-
-	vector<MyRect> constraint_rect; 
-	constraint_rect.resize(4);
-	MyRect rect;
-	rect.left_bottom.x = 0;
-	rect.left_bottom.y = 0;
-	rect.right_top.x = 300;
-	rect.right_top.y = 300;
-	constraint_rect[2] = rect;
-
-	int start, time;
-	//TRnd rnd = ::time(0);
-	int ratio = 256;
-	for (int start_pow = 16; start_pow <= 23; start_pow++)
+	for (int i = 0; i < m_node_count; i++)
 	{
-		//filetime.open("data/size/time.txt", ios::app);
-		filetime << start_pow << " " << pow(2, start_pow) << endl;
-		 
-		stringstream stream;
-		string str;
-		stream << start_pow;
-		stream >> str;
-		string filename_entity = "size/entity" + str + ".txt";
-		string filename_graph = "size/graph" + str + ".txt";
-
-		int node_count = pow(2, start_pow);
-		int range = 500;
-		vector<Entity> entity_vector;
-		ReadEntityFromDisk(node_count, entity_vector, range, filename_entity);
-	
-		vector<vector<int>> graph;
-		graph = ReadVectorFromDisk(filename_graph);
-		//vector<int> graph[8388608 / 32];
-		//ReadArrayVectorFromDisk(graph,filename_graph);
-
-		int sum_time = 0;
-		int sum_paths_count = 0;
-		TRnd Rnd = ::time(0);
-		for (int i = 0; i < 30; i++)
-		{
-			int startnode_id = Rnd.GetUniDev()*node_count*0.5;
-			vector<int> Paths;
-			//Paths.reserve(256 * 256 * 256 * 2 * 7);
-			int start = clock();
-			FindQualifiedPaths(Paths, graph, startnode_id, 3, edge_type, constraint_step, constraint_rect, entity_vector);
-			time = clock() - start;
-			sum_time += time;
-			sum_paths_count += GetPathsCount(); 
-			filetime << startnode_id << " " << Paths.size() << " " << time << endl;
-		}
-		filetime << endl;
-		fileaverage <<node_count <<" "<< sum_paths_count / 30 << " " << sum_time / 30 << endl;
-
- 	}
-	filetime.close();
-	fileaverage.close();
-	
-	
-
-/*	double spatial_range_ratio = 0.02;
-	double spatial_range_size = 0;
-	double nonspatial_entity_ratio = 0.5;
-
-	double a = 0.25, b = 0.25, c = 0.25;
-
-	int start, finish, time;
-	string filename;
-	for (int k = 2; k <= 5; k++)
-	{
-		vector<vector<int>> graph_vector;
-		graph_vector.resize(node_count);
-		for (int i = 0; i < node_count; i++)
-		{
-			graph_vector[i].reserve(700); 
-		}
-		Generate_Vector (graph_vector, node_count, edge_count, a, b, c, 0.5);
-		stringstream stream;
-		string str;
-		stream << k;
-		stream >> str;
-		filename = "128/graph" + str + ".txt";
-		VectorToDisk(graph_vector, filename); 
+		vector<int> transitive_closure_line;
+		transitive_closure_line = GetTransitiveClosureLine(i, graph_v, m_entity);
+		SpatialTransitiveClosureLine_To_Disk(transitive_closure_line, i, path + "spatial_transitive_closure.txt", m_node_count, m_nonspatial_ratio);
 	}
 
-	int x = 0;
-
-	start = clock();
-	VectorToDisk(graph, node_count, "graph1.txt");
-	time = clock() - start;
-
-	start = clock();
-	vector<vector<edge>> graph_vector = ReadVectorFromDisk("graph1.txt");
-	time = clock() - start;
-
-	start = clock();
-	graph_p graph1 = Generate_Graph(node_count, edge_count, a, b, c, 0.3);
-	finish = clock();
-	time = (finish - start) / 1000;
-	//cout << "generate time	" << (finish - start) / 100 << endl;
-
-	start = clock();
-	GraphToDisk(graph1, "graph1.txt");
-	finish = clock();
-	//cout << "out to disk time	" << (finish - start) / 100 << endl;
-	time = (finish - start) / 1000;*/
-
-/*	start = clock();
-	graph_p graph2 = ReadGraphFromDisk("graph1.txt");
-	finish = clock();
-	//cout << "read from disk time	" << (finish - start) / 100 << endl;
-	time = (finish - start) / 1000;
-	int count = graph2->num_vertices;*/
-
-/*	freopen("data/graph1.txt", "r", stdin);
-
-	int count = 0;
-
-	int source_node, dest_node;
-	int edge_type;
+	//vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
+	//TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/Random/transitive_closure.txt");
+	//vector<vector<int>> transitive_closure = GetTransitiveClosure(graph_v, m_entity);
+	//TransitiveClosure_To_Disk(transitive_closure, 1000, "RMBR/Random/transitive_closure_20.txt");
 	
-	scanf("%d", &node_count);
-	graph_p graph = createGraph(node_count, DIRECTED);*/
-
-
-
-	 
+	/*
+	graph_v.clear();
+	Generate_Vector_From_Edge(graph_v, pow(2, 14), pow(2, 14), "RMBR/14/graph_edge_14.txt", 0.4);
+	VectorToDisk(graph_v, "RMBR/14/graph.txt");
+	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
+	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/14/transitive_closure.txt");
+	*/
+	/*
+	graph_v.clear();
+	Generate_Random_Vector(graph_v, pow(2,14), pow(2,14), 0.4);
+	//Generate_Vector_Noback(graph_v, pow(2,14),pow(2,14) , 0.25, 0.25, 0.25, 0.4);
+	VectorToDisk(graph_v, "RMBR/14_my/graph_14.txt");
+	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
+	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/14_my/transitive_closure.txt");*/
 }
 
 

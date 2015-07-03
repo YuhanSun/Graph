@@ -304,7 +304,7 @@ void FindQualifiedPaths(vector<vector<int>> &Paths, vector<int> graph[], int ver
 }
 
 
-void OutFile(vector<vector<int>> graph, string filename)
+void OutFile(vector<vector<int>> &graph, string filename)
 {
 	string root = "data/";
 	root += filename;
@@ -325,7 +325,7 @@ void OutFile(vector<vector<int>> graph, string filename)
 	fclose(stdout);
 }
 
-void VectorToDisk(vector<vector<int>> graph, string filename)
+void VectorToDisk(vector<vector<int>> &graph, string filename)
 {
 	string root = "data/";
 	root += filename;
@@ -381,6 +381,79 @@ void addvector(vector<vector<int>> &graph, int start, int dest, int edge_type)
 {
 	graph[start].push_back(edge_type);
 	graph[start].push_back(dest);
+}
+
+void Generate_Random_Vector(vector<vector<int>> &graph, int node_count, INT64 edge_count, double nonspatial_entity_ratio)
+{
+	::edge_count = 0;
+	graph.resize(node_count);
+	int ratio = edge_count / node_count;
+	for (int i = 0; i < node_count; i++)
+	{
+		graph[i].reserve(ratio * 6);
+	}
+
+	TRnd Rnd = time(0);
+	int i, j;
+
+	while (true)
+	{
+		i = Rnd.GetUniDev()*node_count;
+		j = Rnd.GetUniDev()*node_count;
+		if (i == j)
+			continue;
+		if (i < node_count*nonspatial_entity_ratio && j < node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph, i, j, 0);
+		}
+		if (i < node_count*nonspatial_entity_ratio && j >= node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph, i, j, 2);
+		}
+		if (i >= node_count*nonspatial_entity_ratio && j >= node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph, i, j, 6);
+		}
+		if (i >= node_count*nonspatial_entity_ratio && j < node_count*nonspatial_entity_ratio)
+		{
+			addvector(graph, i, j, 4);
+		}
+		::edge_count++;
+		if (::edge_count == edge_count)
+			break;
+	}
+}
+
+void Generate_Random_DAG(vector<vector<int>> &graph, int node_count, INT64 edge_count, double nonspatial_entity_ratio)
+{
+	::edge_count = 0;
+	graph.resize(node_count);
+	int ratio = edge_count / node_count;
+	for (int i = 0; i < node_count; i++)
+	{
+		graph[i].reserve(ratio * 6);
+	}
+
+	TRnd Rnd = time(0);
+	int i, j;
+
+	while (true)
+	{
+		i = Rnd.GetUniDev()*node_count;
+		j = Rnd.GetUniDev()*node_count;
+		if (i == j)
+			continue;
+
+		if (i < j)
+			addvector(graph, i, j, 999);
+
+		else
+			addvector(graph, j, i, 999);
+
+		::edge_count++;
+		if (::edge_count == edge_count)
+			break;
+	}
 }
 
 void Generate_Vector(vector<vector<int>> &graph, int node_count, __int64 edge_count, double a, double b, double c, double nonspatial_entity_ratio)
@@ -578,6 +651,51 @@ void Generate_Vector_Noback_In_Edge(vector<vector<int>> &graph_outedge, vector<v
 			addvector(graph_outedge, i, j, 4);
 			addvector(graph_inedge, j, i, 4);
 		}
+	}
+}
+
+void Generate_Vector_From_Edge(vector<vector<int>> &graph, int node_count, INT64 edge_count, string filename, double nonspatial_entity_ratio)
+{
+	::edge_count = 0;
+
+	int k = log2(node_count);
+	node_count = pow(2, k);
+
+	graph.resize(node_count);
+	int ratio = edge_count / node_count;
+	for (int i = 0; i < node_count; i++)
+	{
+		graph[i].reserve(ratio * 6);
+	}
+
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	int start, end;
+	while (true)
+	{
+		int i = scanf("%d,%d", &start, &end);
+		if (i == 2)
+		{
+			start--;
+			end--;
+			::edge_count++;
+			if (start < node_count*nonspatial_entity_ratio && end < node_count*nonspatial_entity_ratio)
+				addvector(graph, start, end, 0);
+
+			if (start < node_count*nonspatial_entity_ratio && end >= node_count*nonspatial_entity_ratio)
+				addvector(graph, start, end, 2);
+
+			if (start >= node_count*nonspatial_entity_ratio && end >= node_count*nonspatial_entity_ratio)
+				addvector(graph, start, end, 6);
+
+			if (start >= node_count*nonspatial_entity_ratio && end < node_count*nonspatial_entity_ratio)
+				addvector(graph, start, end, 4);
+		}
+		else
+			break;
 	}
 }
 

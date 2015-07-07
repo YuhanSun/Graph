@@ -251,51 +251,46 @@ HCURSOR Cgraph_2015_1_24_mfcDlg::OnQueryDragIcon()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedtest()
 {
-	graph_v.clear();
-	m_node_count = pow(2, 20);
-	m_edge_count = 1 * m_node_count;
-	m_nonspatial_ratio = 0.4;
-	Generate_Random_Vector(graph_v, m_node_count, m_edge_count, m_nonspatial_ratio);
-	//Generate_Random_DAG(graph_v, m_node_count, m_edge_count, m_nonspatial_ratio);
-	VectorToDisk(graph_v, "RMBR/Random/graph_20.txt");
+	m_range = 1000;
+	vector<vector<int>> graph_entity;
+	vector<set<int>> SCC;
+	m_node_count = pow(2, 18);
+	string path = "RMBR/18_4/";
+	m_edge_count = 4 * m_node_count;
 
-	string path = "RMBR/Random/";
-	string root = "data/";
-	root += path + "spatial_transitive_closure.txt";
-	char *ch = (char *)root.data();
-	freopen(ch, "w", stdout);
-	printf("%d %d\n", m_node_count, m_range);
-	fclose(stdout);
-
-	for (int i = 0; i < m_node_count; i++)
-	{
-		vector<int> transitive_closure_line;
-		transitive_closure_line = GetTransitiveClosureLine(i, graph_v, m_entity);
-		SpatialTransitiveClosureLine_To_Disk(transitive_closure_line, i, path + "spatial_transitive_closure.txt", m_node_count, m_nonspatial_ratio);
-	}
-
-	//vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
-	//TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/Random/transitive_closure.txt");
-	//vector<vector<int>> transitive_closure = GetTransitiveClosure(graph_v, m_entity);
-	//TransitiveClosure_To_Disk(transitive_closure, 1000, "RMBR/Random/transitive_closure_20.txt");
 	
-	/*
-	graph_v.clear();
-	Generate_Vector_From_Edge(graph_v, pow(2, 14), pow(2, 14), "RMBR/14/graph_edge_14.txt", 0.4);
-	VectorToDisk(graph_v, "RMBR/14/graph.txt");
-	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
-	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/14/transitive_closure.txt");
-	*/
-	/*
-	graph_v.clear();
-	Generate_Random_Vector(graph_v, pow(2,14), pow(2,14), 0.4);
-	//Generate_Vector_Noback(graph_v, pow(2,14),pow(2,14) , 0.25, 0.25, 0.25, 0.4);
-	VectorToDisk(graph_v, "RMBR/14_my/graph_14.txt");
-	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
-	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, 1000, "RMBR/14_my/transitive_closure.txt");*/
+	//GenerateArbitaryGraph(graph_entity, m_node_count, m_edge_count,0.25, 0.25, 0.25);
+	//ArbitaryGraphToDisk(graph_entity, path + "graph_entity.txt");
+
+	//graph_entity.resize(m_node_count);
+	//ReadGraphFromEdge(graph_entity, path + "edgelist.txt");
+
+	ReadArbitaryGraphFromDisk(graph_entity, m_node_count, path + "graph_entity.txt");
+	
+	ReadSCC(SCC, path + "SCC.txt");
+
+	//ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, path + "entity.txt");
+
+	GenerateEntityInSCC(m_node_count, m_entity, m_range, 0.4);
+	ConnectSCCEntity(m_entity, SCC);
+
+	GenerateRMBR(m_entity, graph_entity);
+
+	EntityInSCC_To_Disk(m_entity, m_range, path);
+
+	vector<set<int>> graph_SCC;
+	graph_SCC.resize(SCC.size());
+
+	GenerateSCCGraph(m_entity, graph_entity, graph_SCC);
+
+	ArbitaryGraphToDisk(graph_SCC, path + "graph_SCC.txt");
+	
+
+	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_SCC);
+	TransitiveClosureDynamic_To_Disk(transitive_closure, 1000, path + "transitive_closure.txt");
 }
 
-
+ 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
@@ -306,50 +301,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedOk()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedButton1()
 {
-	// TODO: Add your control notification handler code here
-	ofstream filetime("data/size/time.txt",ios::app);
-	ofstream fileaverage("data/size/average_time.txt",ios::app);
-	int start, time;
-
-	int start_pow = 20;
-	//for (int start_pow = 16; start_pow <= 16; start_pow++)
-	//{
-		stringstream stream;
-		string str;
-		stream << start_pow;
-		stream >> str;
-		string filename_entity = "size/entity" + str + ".txt";
-		string filename_graph = "size/graph" + str + ".txt";
-
-		int node_count = pow(2, start_pow);
-		int range = 500;
-
-		//vector<vector<int>> graph;
-		//graph = ReadVectorFromDisk(filename_graph);
-		//vector<int> graph[8388608 / 8];
-		//ReadArrayVectorFromDisk(graph,filename_graph);
-
-		int sum_time = 0;
-		int sum_paths_count = 0;
-		vector<int> * x;
-		int * y;
-		int z;
-		TRnd Rnd = ::time(0);
-		for (int i = 0; i < 10000000; i++)
-		{
-			int startnode_id = Rnd.GetUniDev()*node_count*0.5;
-
-			int start = clock();
-			x = &graph_a[startnode_id];
-			y = &(graph_a[startnode_id][0]);
-			z = *y;
-			time = clock() - start;
-			sum_time += time;
-		}
-		fileaverage << node_count << " "<< sum_time <<" " << x <<" "<<y<<" "<<z<<endl;
-	//}
-	filetime.close();
- 	fileaverage.close();
+	
 }
 
 
@@ -1086,7 +1038,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRmbr()
 
 	RMBR_To_Disk(m_entity, m_range, path + "RMBR.txt");
 
-	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_v, m_entity);
+	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_v);
 	SpatialTransitiveClosureDynamic_To_Disk(transitive_closure, m_range, path + "spatial_transitive_closure.txt", m_entity);
 
 	//vector<vector<int>> transitive_closure = GetTransitiveClosure(graph_v, m_entity);
@@ -1240,17 +1192,17 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGenerationTest()
 	int count = GetEdgeCount();
 	//VectorToDisk(p_graph_v, path + "graph.txt");
 	int start = clock();
-	vector<vector<int>> transitive_closure = GetTransitiveClosure(p_graph_v, p_entity);
+	vector<vector<int>> transitive_closure = GetTransitiveClosure(p_graph_v);
 	int time1 = clock() - start;
 
 	//TransitiveClosure_To_Disk(transitive_closure, m_range, path + "transitive_closure.txt");
 
 	start = clock();
-	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(p_graph_v, p_entity);
+	vector<set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic_In_Set(p_graph_v);
 	int time2 = clock() - start;
 
 	start = clock();
-	vector<hash_set<int>> hs_transitive_closure_dynamic = GetTransitiveClosureDynamic(p_graph_v, p_entity);
+	vector<hash_set<int>> hs_transitive_closure_dynamic = GetTransitiveClosureDynamic(p_graph_v);
 	int time3 = clock() - start;
 
 	//TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, m_range, path + "transitive_closure_dynamic.txt");
@@ -1283,6 +1235,6 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead()
 
 	ReadEntityFromDisk(m_node_count, m_entity, m_range, path + "entity.txt");
 	graph_v = ReadVectorFromDisk(path + "graph.txt");
-	vector<hash_set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic(graph_v, m_entity);
+	vector<hash_set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic(graph_v);
 	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, m_range, path + "transitive_closure_dynamic.txt");
 }

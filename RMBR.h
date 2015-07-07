@@ -17,9 +17,9 @@ bool ReachabilityQuery(vector<Entity> &entity,vector<vector<int>> &graph, int st
 
 //for transitive closure testing
 void Traverse(int id, vector<vector<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices);
-vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Entity> &entity);
-vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &graph, vector<Entity> &entity);
-vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vector<Entity> &p_entity);
+vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph);
+vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph);
+vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph);
 vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &graph_outedge, vector<vector<int>> &graph_inedge);
 vector<MyRect> GetRMBRFromTransitiveClosure(vector<vector<int>> &transitive_closure, vector<Entity> &entity);
 vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity);

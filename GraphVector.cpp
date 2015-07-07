@@ -5,6 +5,7 @@ char* edge_index[7] = { "Friend", "Family", "Like", "Visit", "Liked", "Visited",
 int Paths_count = 0;
 INT64 edge_count = 0;
 
+
 int GetPathsCount()
 {
 	return Paths_count;

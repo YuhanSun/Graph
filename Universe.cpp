@@ -62,7 +62,7 @@ void OutFile(Entity Entity_Matrix[], int node_count, string filename)
 	file.close();
 }
 
-void OutFile(vector<Entity> entity_vector, string filename)
+void OutFile(vector<Entity> &entity_vector, string filename)
 {
 	ofstream file;
 	file.open("data/" + filename);

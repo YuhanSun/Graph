@@ -1,6 +1,7 @@
 /*Universe.h*/
 #ifndef _UNIVERSE_H_
 #define _UNIVERSE_H_
+#include <iostream>
 #include <fstream>
 using namespace std;
 #include <vector>
@@ -11,6 +12,7 @@ using namespace std;
 #include "Rand.h"
 #include "RTree.h"
 #include <iterator>
+#include <time.h>
 
 struct Location
 {
@@ -30,6 +32,7 @@ struct Entity
 	Location location;
 	int type;
 	MyRect RMBR;
+	int scc_id;
 };
 
 struct Rect
@@ -76,7 +79,7 @@ void EntityToDIsk(vector<Entity> entity_vector, int range, string filename);
 
 //Out file entity to disk for displaying
 void OutFile(Entity Entity_Matrix[], int node_count, string filename);
-void OutFile(vector<Entity> entity_vector, string filename);
+void OutFile(vector<Entity> &entity_vector, string filename);
 
 //Generate entity with specific spatial entity ratio
 void GenerateEntity(int node_count, Entity Entity_Matrix[], int range, double nonspatial_entity_ratio);

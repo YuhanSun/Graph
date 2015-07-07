@@ -159,7 +159,7 @@ bool ReachabilityQuery(vector<Entity> &entity, vector<vector<int>> &graph, int s
 }
 
 ////for transitive closure testing
-vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Entity> &entity)
+vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph)
 {
 	int node_count = graph.size();
 
@@ -180,7 +180,7 @@ vector<vector<int>> GetTransitiveClosure(vector<vector<int>> &graph, vector<Enti
 	return transitive_closure;
 }
 
-vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph, vector<Entity> &p_entity)
+vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph)
 {
 	int p_node_count = p_graph.size();
 
@@ -231,7 +231,7 @@ vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph
 	return transitive_closure;
 }
 
-vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph, vector<Entity> &p_entity)
+vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph)
 {
 	int p_node_count = p_graph.size();
 

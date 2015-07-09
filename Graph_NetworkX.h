@@ -12,7 +12,8 @@ vector<vector<int>> GetTransitiveClosure(vector<set<int>> &graph);
 
 void GenerateEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio);//Generate entity which are randomly selected as spatial nodes and arbitary types
 void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
-void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename);
+void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
+void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename);
 
 void AddEdge(vector<set<int>> &graph, int start, int end);
 void GenerateArbitaryGraph(vector<set<int>> &graph, int node_count, INT64 edge_count);
@@ -27,5 +28,8 @@ void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph);
 
 vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<set<int>> &graph);
 vector<vector<int>> GetTransitiveClosureDynamicNew(vector<vector<int>> &p_graph);
+
+//DAG
+void GenerateDAG(vector<set<int>> &dag, int node_count, INT64 edge_count);
 
 #endif _GRAPH_NETWORKX_H_

@@ -16,13 +16,15 @@
 
 //vector<vector<int>> graph = ReadVectorFromDisk("size/graph20.txt");
 //vector<vector<int>> graph_v = ReadVectorFromDisk("size/graph19.txt");
-vector<vector<int>> graph_v;
-vector<vector<int>> graph_inedge_v;
+vector<vector<int>> m_graph_v;
+vector<vector<int>> m_graph_inedge_v;
 vector<Entity> m_entity;
 int m_range;
 int m_node_count;
 int m_edge_count;
-double m_nonspatial_ratio = 0.2;
+double m_nonspatial_ratio;
+string m_path;
+
 
 typedef RTree<int, double, 2, double> MyTree;
 MyTree tree;
@@ -151,6 +153,8 @@ BEGIN_MESSAGE_MAP(Cgraph_2015_1_24_mfcDlg, CDialogEx)
 ON_BN_CLICKED(IDC_ReachQuery, &Cgraph_2015_1_24_mfcDlg::OnBnClickedReachquery)
 ON_BN_CLICKED(IDC_BUTTON_Generation_Test, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGenerationTest)
 ON_BN_CLICKED(IDC_BUTTON_Read, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead)
+ON_BN_CLICKED(IDC_BUTTON_DAG_Generate, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonDagGenerate)
+ON_BN_CLICKED(IDC_BUTTON_Entity, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonEntity)
 END_MESSAGE_MAP()
 
 
@@ -252,42 +256,25 @@ HCURSOR Cgraph_2015_1_24_mfcDlg::OnQueryDragIcon()
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedtest()
 {
 	m_range = 1000;
-	vector<vector<int>> graph_entity;
-	vector<set<int>> SCC;
+
 	m_node_count = pow(2, 18);
-	string path = "RMBR/18_4/";
-	m_edge_count = 4 * m_node_count;
-
+	m_path = "RMBR/18_16/";
+	m_edge_count = 16 * m_node_count;
 	
-	//GenerateArbitaryGraph(graph_entity, m_node_count, m_edge_count,0.25, 0.25, 0.25);
-	//ArbitaryGraphToDisk(graph_entity, path + "graph_entity.txt");
-
-	//graph_entity.resize(m_node_count);
-	//ReadGraphFromEdge(graph_entity, path + "edgelist.txt");
-
-	ReadArbitaryGraphFromDisk(graph_entity, m_node_count, path + "graph_entity.txt");
-	
-	ReadSCC(SCC, path + "SCC.txt");
-
-	//ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, path + "entity.txt");
-
-	GenerateEntityInSCC(m_node_count, m_entity, m_range, 0.4);
-	ConnectSCCEntity(m_entity, SCC);
-
-	GenerateRMBR(m_entity, graph_entity);
-
-	EntityInSCC_To_Disk(m_entity, m_range, path);
-
-	vector<set<int>> graph_SCC;
-	graph_SCC.resize(SCC.size());
-
-	GenerateSCCGraph(m_entity, graph_entity, graph_SCC);
-
-	ArbitaryGraphToDisk(graph_SCC, path + "graph_SCC.txt");
-	
-
-	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_SCC);
-	TransitiveClosureDynamic_To_Disk(transitive_closure, 1000, path + "transitive_closure.txt");
+	//GenerateArbitaryGraph(m_graph_v, m_node_count, m_edge_count, 0.25, 0.25, 0.25);
+	//ArbitaryGraphToDisk(m_graph_v, m_path + "graph_entity.txt");
+	vector<set<int>> graph_set;
+	ReadArbitaryGraphFromDisk(graph_set, m_node_count, "RMBR/18_16/graph_entity.txt");
+	ReadEntityInSCCSeperateFromDisk(m_node_count, m_entity, m_range, "RMBR/18_16/");
+	for (int i = 0; i < m_node_count; i++)
+	{
+		m_entity[i].RMBR.left_bottom.x = -1;
+		m_entity[i].RMBR.left_bottom.y = -1;
+		m_entity[i].RMBR.right_top.x = -1;
+		m_entity[i].RMBR.right_top.y = -1;
+	}
+	GenerateRMBR(m_entity, graph_set);
+	EntityInSCCSeperate_To_Disk(m_entity, m_range, "RMBR/18_16/new_seperate");
 }
 
  
@@ -301,7 +288,42 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedOk()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedButton1()
 {
-	
+	m_range = 1000;
+	vector<set<int>> SCC;
+	m_node_count = pow(2, 18);
+	m_path = "RMBR/18_16/";
+	m_edge_count = 16 * m_node_count;
+
+
+	//GenerateArbitaryGraph(graph_entity, m_node_count, m_edge_count,0.25, 0.25, 0.25);
+	//ArbitaryGraphToDisk(graph_entity, path + "graph_entity.txt");
+
+	//graph_entity.resize(m_node_count);
+	//ReadGraphFromEdge(graph_entity, path + "edgelist.txt");
+
+	//ReadArbitaryGraphFromDisk(graph_entity, m_node_count, m_path + "graph_entity.txt");
+
+	ReadSCC(SCC, m_path + "SCC.txt");
+
+	//ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, path + "entity.txt");
+
+	GenerateEntityInSCC(m_node_count, m_entity, m_range, 0.4);
+	ConnectSCCEntity(m_entity, SCC);
+
+	GenerateRMBR(m_entity, m_graph_v);
+
+	EntityInSCCSeperate_To_Disk(m_entity, m_range, m_path);
+
+	vector<set<int>> graph_SCC;
+	graph_SCC.resize(SCC.size());
+
+	GenerateSCCGraph(m_entity, m_graph_v, graph_SCC);
+
+	ArbitaryGraphToDisk(graph_SCC, m_path + "graph_SCC.txt");
+
+
+	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_SCC);
+	TransitiveClosureDynamic_To_Disk(transitive_closure, 1000, m_path + "transitive_closure.txt");
 }
 
 
@@ -349,7 +371,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButton2()
 	rect.right_top.y = 300;
 	constraint_rect[2] = rect;
 
-	int startnode_id = rnd.GetUniDev()*graph_v.size()*0.5;
+	int startnode_id = rnd.GetUniDev()*m_graph_v.size()*0.5;
 	vector<int> Paths;
 	Paths.reserve(256 * 256 * 256 * 256 * 2 * 7);
 
@@ -419,7 +441,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedHoptest()
 		int sum_time = 0,sum_pathscount = 0;
 		for (int j = 0; j < 30; j++)
 		{
-			int startnode_id = rnd.GetUniDev()*graph_v.size()*0.5;
+			int startnode_id = rnd.GetUniDev()*m_graph_v.size()*0.5;
 			vector<int> Paths;
 			int start, time;
 			start = clock();
@@ -473,7 +495,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedSizetest()
 		int sum_time = 0, sum_pathscount = 0;
 		for (int j = 0; j < 30; j++)
 		{
-			int startnode_id = rnd.GetUniDev()*graph_v.size()*0.5;
+			int startnode_id = rnd.GetUniDev()*m_graph_v.size()*0.5;
 			vector<int> Paths;
 			int start, time;
 			start = clock();
@@ -704,7 +726,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonspatialfirst()
 			start = clock();
 			for (int j = 0; j < hit_id.size(); j++)
 			{
-				FindQualifiedPaths(paths, graph_v, hit_id[j], end_type, 2, edge_type, m_entity);
+				FindQualifiedPaths(paths, m_graph_v, hit_id[j], end_type, 2, edge_type, m_entity);
 				pathcount += GetPathsCount();
 			}
 			int time_graph = clock() - start;
@@ -766,7 +788,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonspatialfirsttest()
 			vector<int> hit_id = GetHitID();
 			for (int j = 0; j < hit_id.size(); j++)
 			{
-				FindQualifiedPaths(paths, graph_v, hit_id[j], end_type, 2, edge_type, m_entity);
+				FindQualifiedPaths(paths, m_graph_v, hit_id[j], end_type, 2, edge_type, m_entity);
 				pathcount += GetPathsCount();
 			}
 			int time = clock() - start;
@@ -844,7 +866,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonsocialfirsttest()
 				{
 					qualified_node_count++;
 					vector<int> paths;
-					FindQualifiedPaths(paths, graph_v, j, 2, edge_type, spatial_step, constraint_rect, m_entity);
+					FindQualifiedPaths(paths, m_graph_v, j, 2, edge_type, spatial_step, constraint_rect, m_entity);
 					pathcount += GetPathsCount();
 					continue;
 				}
@@ -917,7 +939,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtoninitialize()
 		tree.Insert(min, max, i);
 	}
 
-	graph_v = ReadVectorFromDisk("comparison-0.4-0.6/graph.txt");
+	m_graph_v = ReadVectorFromDisk("comparison-0.4-0.6/graph.txt");
 }
 
 
@@ -991,7 +1013,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtoncomparison()
 				{
 					qualified_node_count++;
 					vector<int> paths;
-					FindQualifiedPaths(paths, graph_v, j, 2, edge_type, spatial_step, constraint_rect, m_entity);
+					FindQualifiedPaths(paths, m_graph_v, j, 2, edge_type, spatial_step, constraint_rect, m_entity);
 					pathcount += GetPathsCount();
 					continue;
 				}
@@ -1025,8 +1047,8 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRmbr()
 	
 	//vector<vector<int>> graph;
 	double a = 0.25, b = 0.25, c = 0.25;
-	Generate_Vector_Noback(graph_v, node_count, edge_count, a, b, c, 0.4);
-	VectorToDisk(graph_v, path + "graph.txt");
+	Generate_Vector_Noback(m_graph_v, node_count, edge_count, a, b, c, 0.4);
+	VectorToDisk(m_graph_v, path + "graph.txt");
 	
 	edge_count = GetEdgeCount();
 
@@ -1034,11 +1056,11 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRmbr()
 
 	//graph_v = ReadVectorFromDisk("RMBR/graph.txt");
 
-	GenerateRMBR(m_entity, graph_v);
+	GenerateRMBR(m_entity, m_graph_v);
 
 	RMBR_To_Disk(m_entity, m_range, path + "RMBR.txt");
 
-	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(graph_v);
+	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(m_graph_v);
 	SpatialTransitiveClosureDynamic_To_Disk(transitive_closure, m_range, path + "spatial_transitive_closure.txt", m_entity);
 
 	//vector<vector<int>> transitive_closure = GetTransitiveClosure(graph_v, m_entity);
@@ -1139,10 +1161,10 @@ void Cgraph_2015_1_24_mfcDlg::OnEnChangeEditstartvertex()
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedRmbrInitizlize()
 {
 	m_entity.clear();
-	graph_v.clear();
+	m_graph_v.clear();
 	ReadEntityFromDisk(m_node_count, m_entity, range, "RMBR/entity.txt");
 	ReadRmbr(m_entity, range, "RMBR/RMBR.txt");
-	graph_v = ReadVectorFromDisk("RMBR/graph.txt");
+	m_graph_v = ReadVectorFromDisk("RMBR/graph.txt");
 }
 
 
@@ -1160,7 +1182,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedReachquery()
 	for (int i = 0; i < m_node_count; i++)
 	{
 		Initialize_Visited_vertex();
-		bool result = ReachabilityQuery(m_entity, graph_v, i, rect);
+		bool result = ReachabilityQuery(m_entity, m_graph_v, i, rect);
 		if (result)
 			file_result << "true\n";
 		else
@@ -1234,7 +1256,45 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead()
 	string path = "RMBR/test/";
 
 	ReadEntityFromDisk(m_node_count, m_entity, m_range, path + "entity.txt");
-	graph_v = ReadVectorFromDisk(path + "graph.txt");
-	vector<hash_set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic(graph_v);
+	m_graph_v = ReadVectorFromDisk(path + "graph.txt");
+	vector<hash_set<int>> transitive_closure_dynamic = GetTransitiveClosureDynamic(m_graph_v);
 	TransitiveClosureDynamic_To_Disk(transitive_closure_dynamic, m_range, path + "transitive_closure_dynamic.txt");
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonDagGenerate()
+{
+	m_node_count = pow(2, 18);
+	int ratio = 16;
+	m_edge_count = ratio * m_node_count;
+	vector<set<int>> dag;
+	m_path = "RMBR/DAG/18_16/";
+
+	GenerateDAG(dag, m_node_count, m_edge_count);
+	ArbitaryGraphToDisk(dag, m_path + "dag.txt");
+
+	//ReadArbitaryGraphFromDisk(dag, m_node_count, m_path + "dag.txt");
+	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(dag);
+	TransitiveClosureDynamic_To_Disk(transitive_closure, 1000, m_path + "transitive_closure.txt");
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonEntity()
+{
+	// TODO: Add your control notification handler code here
+	m_node_count = pow(2, 18);
+	int ratio = 1;
+	m_edge_count = ratio * m_node_count;
+	m_range = 1000;
+	m_nonspatial_ratio = 0.4;
+	vector<set<int>> dag;
+	m_path = "RMBR/DAG/18_4/";
+
+	ReadArbitaryGraphFromDisk(dag, m_node_count, m_path + "dag.txt");
+
+	GenerateEntityInSCC(m_node_count, m_entity, m_range, m_nonspatial_ratio);
+
+	GenerateRMBR(m_entity, dag);
+
+	EntityInSCCSeperate_To_Disk(m_entity, m_range, "RMBR/DAG/18_4");
 }

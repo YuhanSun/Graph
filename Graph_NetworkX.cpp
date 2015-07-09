@@ -184,7 +184,45 @@ void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int
 	fclose(stdin);
 }
 
-void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename)
+void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename)
+{
+	string root = "data/";
+	root += (filename + "/spatial_entity.txt");
+	char *ch = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d %d", &node_count, &range);
+	entity_vector.resize(node_count);
+	while (true)
+	{
+		int id;
+		int count = scanf("%d ", &id);
+		entity_vector[id].id = id;
+		if (count != 1)
+			break;
+		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+	}
+	fclose(stdin);
+
+	root = "data/";
+	root += (filename + "/nonspatial_entity.txt");
+	char *ch2 = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d %d", &node_count, &range);
+	while (true)
+	{
+		int id;
+		int count = scanf("%d ", &id);
+		entity_vector[id].id = id;
+		if (count != 1)
+			break;
+		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+	}
+	fclose(stdin);
+}
+
+void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename)
 {
 	string root = "data/";
 	root += (filename + "/spatial_entity.txt");
@@ -204,6 +242,7 @@ void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filena
 	char *ch2 = (char *)root.data();
 	freopen(ch2, "w", stdout);
 
+	printf("%d %d\n", entity_vector.size(), range);
 	for (int i = 0; i < entity_vector.size(); i++)
 	{
 		if (!entity_vector[i].IsSpatial)
@@ -379,6 +418,7 @@ void ReadArbitaryGraphFromDisk(vector<set<int>> &graph, int &node_count, string 
 			graph[i].insert(outid);
 		}
 	}
+	fclose(stdin);
 }
 
 void ReadArbitaryGraphFromDisk(vector<vector<int>> &graph, int &node_count, string filename)
@@ -402,6 +442,7 @@ void ReadArbitaryGraphFromDisk(vector<vector<int>> &graph, int &node_count, stri
 			graph[i][j] = outid;
 		}
 	}
+	fclose(stdin);
 }
 
 void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph)
@@ -533,4 +574,34 @@ vector<vector<int>> GetTransitiveClosureDynamicNew(vector<vector<int>> &p_graph)
 		}
 	}
 	return transitive_closure;
+}
+
+void GenerateDAG(vector<set<int>> &dag, int node_count, INT64 edge_count)
+{
+	int count = 0;
+	dag.resize(node_count);
+
+	TRnd Rnd = time(0);
+	int i, j;
+
+	while (true)
+	{
+		i = Rnd.GetUniDev()*node_count;
+		j = Rnd.GetUniDev()*node_count;
+		if (i == j)
+			continue;
+		if (i > j)
+		{
+			int a = i;
+			i = j;
+			j = a;
+		}
+		int currentsize = dag[i].size();
+		dag[i].insert(j);
+		if (currentsize == dag[i].size())
+			continue;
+		count++; 
+		if (count == edge_count)
+			break;
+	}
 }

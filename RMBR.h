@@ -22,13 +22,14 @@ vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<vector<int>> &p_graph
 vector<hash_set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &p_graph);
 vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &graph_outedge, vector<vector<int>> &graph_inedge);
 vector<MyRect> GetRMBRFromTransitiveClosure(vector<vector<int>> &transitive_closure, vector<Entity> &entity);
-vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity);
+vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph);
 
 void ReadTransitiveClosure(vector<vector<int>> &transitive_closure, int &node_count, int &range, string filename);
 
 void TransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename);
 void TransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynamic, int range, string filename);
 void TransitiveClosureDynamic_To_Disk(vector<hash_set<int>> &transitive_closure_dynamic, int range, string filename);
+void TransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, int node_count);
 void SpatialTransitiveClosureDynamic_To_Disk(vector<set<int>> &transitive_closure_dynamic, int range, string filename, vector<Entity> p_entity);
 void SpatialTransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename, vector<Entity> p_entity);
 void SpatialTransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, int node_count, double nonspatial_ratio);

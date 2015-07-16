@@ -576,6 +576,82 @@ vector<vector<int>> GetTransitiveClosureDynamicNew(vector<vector<int>> &p_graph)
 	return transitive_closure;
 }
 
+void GetTransitiveClosureDynamicByMatrix()
+{
+	vector<vector<bool>> transitive_closure;
+	char *ch = "data/RMBR/DAG/18_16/dag.txt";
+	freopen(ch, "r", stdin);
+
+	int node_count;
+	scanf("%d\n", &node_count);
+	transitive_closure.resize(node_count);
+	for (int i = 0; i < node_count; i++)
+	{
+		transitive_closure[i].resize(node_count);
+	}
+	for (int i = 0; i < node_count; i++)
+	{
+		int id, count;
+		scanf("%d %d ", &id, &count);
+		for (int j = 0; j < count; j++)
+		{
+			int neighbor;
+			scanf("%d ", &neighbor);
+			transitive_closure[i][neighbor] = true;
+		}
+	}
+
+	fclose(stdin);
+
+	bool changed = true;
+	while (changed)
+	{
+		changed = false;
+		for (int i = 0; i < node_count; i++)
+		{
+			for (int j = i; j < node_count; j++)
+			{
+				if (transitive_closure[i][j])
+				{
+					for (int k = j; k < node_count; k++)
+					{
+						if (transitive_closure[i][k])
+							continue;
+						else
+							if (transitive_closure[j][k])
+							{
+								transitive_closure[i][k] = true;
+								changed = true;
+							}
+					}
+				}
+			}
+		}
+	}
+
+	char *ch2 = "data/RMBR/DAG/18_18/transitive_closure.txt";
+	freopen(ch2, "w", stdout);
+	printf("%d %d\n", node_count, 1000);
+
+	for (int i = 0; i < node_count; i++)
+	{
+		int count = 0;
+		for (int j = 0; j < node_count; j++)
+		{
+			if (transitive_closure[i][j])
+				count++;
+		}
+		printf("%d %d ", i, count);
+		for (int j = 0; j < node_count; j++)
+		{
+			if (transitive_closure[i][j])
+				printf("%d ", j);
+		}
+		printf("\n");
+	}
+	fclose(stdout);
+}
+
 void GenerateDAG(vector<set<int>> &dag, int node_count, INT64 edge_count)
 {
 	int count = 0;
@@ -605,3 +681,132 @@ void GenerateDAG(vector<set<int>> &dag, int node_count, INT64 edge_count)
 			break;
 	}
 }
+
+void GenerateDAG(vector<vector<int>> &dag, int node_count, INT64 edge_count)
+{
+	int count = 0;
+	dag.resize(node_count);
+
+	int ratio = edge_count / node_count;
+
+	for (int i = 0; i < node_count; i++)
+	{
+		dag[i].reserve(ratio * 3);
+	}
+
+	TRnd Rnd = time(0);
+	int i, j;
+
+	for (int k = 0; k < edge_count;k++)
+	{
+		i = Rnd.GetUniDev()*node_count;
+		j = Rnd.GetUniDev()*node_count;
+		if (i == j)
+			continue;
+		if (i > j)
+		{
+			int a = i;
+			i = j;
+			j = a;
+		}
+		int currentsize = dag[i].size();
+		dag[i].push_back(j);
+	}
+}
+
+/*
+void GenerateDAG(vector<set<int>> &dag, vector<vector<int>> &node_distribution, int node_count, int level_count, int average_degree)
+{
+	node_distribution.resize(level_count);
+	node_distribution.reserve(node_count / level_count *1.5);
+	TRnd Rnd = time(0);
+	for (int i = 0; i < node_count; i++)
+	{
+		int i_level = Rnd.GetUniDev() *level_count;
+		node_distribution[i_level].push_back(i);
+	}
+
+	for (int i = 1; i < level_count - 1; i++)
+	{
+		int higher_count = 0, lower_count = 0;
+		for (int j = 0; j < i; j++)
+			higher_count += node_distribution[j].size();
+		for (int j = i + 1; j < level_count; j++)
+			lower_count += node_distribution[j].size();
+
+		for (int j = 0; j < node_distribution[i].size(); j++)
+		{
+			int start_index = Rnd.GetUniDev()*higher_count;
+			for (int k = 0; k < i; k++)
+			{
+				if (start_index>node_distribution[k].size())
+				{
+					start_index -= node_distribution[k].size();
+					continue;
+				}
+				else
+
+			}
+		}
+	}
+
+}*/
+
+vector<int> GetTransitiveClosureLineArbitary(int i, vector<vector<int>> &graph)
+{
+	int node_count = graph.size();
+	vector<bool> isvisited;
+	isvisited.resize(node_count);
+
+	vector<int> transitiveclosure_line;
+	transitiveclosure_line.reserve(node_count);
+
+	TraverseArbitary(i, graph, isvisited, transitiveclosure_line);
+
+	return transitiveclosure_line;
+}
+
+vector<int> GetTransitiveClosureLineArbitary(int i, vector<set<int>> &graph)
+{
+	int node_count = graph.size();
+	vector<bool> isvisited;
+	isvisited.resize(node_count);
+
+	vector<int> transitiveclosure_line;
+	transitiveclosure_line.reserve(node_count);
+
+	TraverseArbitary(i, graph, isvisited, transitiveclosure_line);
+
+	return transitiveclosure_line;
+}
+
+void TraverseArbitary(int id, vector<vector<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices)
+{
+	for (int i = 0; i < graph[id].size(); i++)
+	{
+		int out_id = graph[id][i];
+		if (!isvisted[out_id])
+		{
+			isvisted[out_id] = true;
+			reach_vertices.push_back(out_id);
+			TraverseArbitary(out_id, graph, isvisted, reach_vertices);
+		}
+	}
+}
+
+void TraverseArbitary(int id, vector<set<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices)
+{
+	set<int>::iterator end = graph[id].end();
+
+	for (set<int>::iterator iter = graph[id].begin(); iter != end; iter++)
+	{
+		int out_id = *iter;
+		if (!isvisted[out_id])
+		{
+			isvisted[out_id] = true;
+			reach_vertices.push_back(out_id);
+			TraverseArbitary(out_id, graph, isvisted, reach_vertices);
+		}
+	}
+}
+

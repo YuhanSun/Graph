@@ -357,7 +357,7 @@ vector<set<int>> GetTransitiveClosureDynamic(vector<vector<int>> &graph_outedge,
 	return transitive_closure;
 }
 
-vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph, vector<Entity> &entity)
+vector<int>GetTransitiveClosureLine(int i, vector<vector<int>> &graph)
 {
 	int node_count = graph.size();
 	vector<bool> isvisited;
@@ -520,6 +520,27 @@ void TransitiveClosureDynamic_To_Disk(vector<hash_set<int>> &transitive_closure_
 	}
 	fclose(stdout);
 }
+
+void TransitiveClosureLine_To_Disk(vector<int> &transitive_closure_line, int id, string filename, int node_count)
+{
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "a", stdout);
+
+	printf("%d %d ", id, transitive_closure_line.size());
+
+	for (int j = 0; j < transitive_closure_line.size(); j++)
+	{
+		int id = transitive_closure_line[j];
+		printf("%d ", id);
+	}
+
+	printf("\n");
+
+	fclose(stdout);
+}
+
 
 
 void SpatialTransitiveClosure_To_Disk(vector<vector<int>> &transitive_closure, int range, string filename, vector<Entity> p_entity)

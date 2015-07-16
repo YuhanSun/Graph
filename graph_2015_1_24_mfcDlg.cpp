@@ -1264,18 +1264,26 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonDagGenerate()
 {
+	
 	m_node_count = pow(2, 18);
-	int ratio = 16;
+	int ratio = 10;
 	m_edge_count = ratio * m_node_count;
 	vector<set<int>> dag;
-	m_path = "RMBR/DAG/18_16/";
+	m_path = "RMBR/DAG/18_10";
 
 	GenerateDAG(dag, m_node_count, m_edge_count);
-	ArbitaryGraphToDisk(dag, m_path + "dag.txt");
+	ArbitaryGraphToDisk(dag, m_path + "/dag.txt");
 
 	//ReadArbitaryGraphFromDisk(dag, m_node_count, m_path + "dag.txt");
-	vector<set<int>> transitive_closure = GetTransitiveClosureDynamic_In_Set(dag);
-	TransitiveClosureDynamic_To_Disk(transitive_closure, 1000, m_path + "transitive_closure.txt");
+	for (int i = 0; i < m_node_count; i++)
+	{
+		vector<int> current_tran = GetTransitiveClosureLineArbitary(i, dag);
+		TransitiveClosureLine_To_Disk(current_tran, i, m_path + "/transitive_closure.txt", m_node_count);
+	}
+	GenerateEntityInSCC(m_node_count, m_entity,1000, 0.4);
+	GenerateRMBR(m_entity, dag);
+	EntityInSCCSeperate_To_Disk(m_entity, 1000, m_path);
+
 }
 
 

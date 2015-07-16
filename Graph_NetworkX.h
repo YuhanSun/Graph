@@ -28,8 +28,16 @@ void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph);
 
 vector<set<int>> GetTransitiveClosureDynamic_In_Set(vector<set<int>> &graph);
 vector<vector<int>> GetTransitiveClosureDynamicNew(vector<vector<int>> &p_graph);
+void GetTransitiveClosureDynamicByMatrix();//for dag
 
 //DAG
 void GenerateDAG(vector<set<int>> &dag, int node_count, INT64 edge_count);
+void GenerateDAG(vector<vector<int>> &dag, int node_count, INT64 edge_count);
+//void GenerateDAG(vector<set<int>> &dag, vector<vector<int>> &node_distribution, int node_count, int level_count, int average_degree);
+
+vector<int> GetTransitiveClosureLineArbitary(int i, vector<vector<int>> &graph);
+vector<int> GetTransitiveClosureLineArbitary(int i, vector<set<int>> &graph);
+void TraverseArbitary(int id, vector<vector<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices);
+void TraverseArbitary(int id, vector<set<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices);
 
 #endif _GRAPH_NETWORKX_H_

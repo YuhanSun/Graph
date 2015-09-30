@@ -6,7 +6,6 @@
 #include "graph_2015_1_24_mfcDlg.h"
 #include "afxdialogex.h"
 #include <string>
-#include <sstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -149,12 +148,20 @@ BEGIN_MESSAGE_MAP(Cgraph_2015_1_24_mfcDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_RMBR, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRmbr)
 	ON_EN_CHANGE(IDC_EDIT_startvertex, &Cgraph_2015_1_24_mfcDlg::OnEnChangeEditstartvertex)
 	ON_BN_CLICKED(IDC_RMBR_Initizlize, &Cgraph_2015_1_24_mfcDlg::OnBnClickedRmbrInitizlize)
-//	ON_BN_CLICKED(IDC_BUTTON6, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButton6)
+
 ON_BN_CLICKED(IDC_ReachQuery, &Cgraph_2015_1_24_mfcDlg::OnBnClickedReachquery)
 ON_BN_CLICKED(IDC_BUTTON_Generation_Test, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGenerationTest)
 ON_BN_CLICKED(IDC_BUTTON_Read, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead)
 ON_BN_CLICKED(IDC_BUTTON_DAG_Generate, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonDagGenerate)
 ON_BN_CLICKED(IDC_BUTTON_Entity, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonEntity)
+ON_BN_CLICKED(IDC_BUTTON_RandomGraph_Generate, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRandomgraphGenerate)
+ON_BN_CLICKED(IDC_BUTTON_RealData_Generate, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRealdataGenerate)
+ON_BN_CLICKED(IDC_BUTTON_Gen_Entity, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGenEntity)
+ON_BN_CLICKED(IDC_BUTTON_Spatial_Tran, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonSpatialTran)
+ON_BN_CLICKED(IDC_BUTTON_Transform, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonTransform)
+ON_BN_CLICKED(IDC_BUTTON_Graph_Transform, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGraphTransform)
+ON_BN_CLICKED(IDC_BUTTON_Reserse_Transform, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonReserseTransform)
+ON_BN_CLICKED(IDC_BUTTONGrid_Generate, &Cgraph_2015_1_24_mfcDlg::OnBnClickedButtongridGenerate)
 END_MESSAGE_MAP()
 
 
@@ -255,26 +262,49 @@ HCURSOR Cgraph_2015_1_24_mfcDlg::OnQueryDragIcon()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedtest()
 {
-	m_range = 1000;
+	vector<Entity> entity1,entity2;
+	ReadEntityInSCCFromDisk(m_node_count, entity1, m_range, "Real_Data/citeseer/Random_spatial_distributed/20/entity.txt");
+	ReadEntityInSCCFromDisk(m_node_count, entity2, m_range, "Real_Data/citeseer/Random_spatial_distributed/20/entity.txt");
 
-	m_node_count = pow(2, 18);
-	m_path = "RMBR/18_16/";
-	m_edge_count = 16 * m_node_count;
-	
-	//GenerateArbitaryGraph(m_graph_v, m_node_count, m_edge_count, 0.25, 0.25, 0.25);
-	//ArbitaryGraphToDisk(m_graph_v, m_path + "graph_entity.txt");
-	vector<set<int>> graph_set;
-	ReadArbitaryGraphFromDisk(graph_set, m_node_count, "RMBR/18_16/graph_entity.txt");
-	ReadEntityInSCCSeperateFromDisk(m_node_count, m_entity, m_range, "RMBR/18_16/");
-	for (int i = 0; i < m_node_count; i++)
+	vector<set<int>> graph;
+	ReadArbitaryGraphFromDisk(graph, m_node_count, "Real_Data/citeseer/graph.txt");
+	int start = clock();
+	GenerateRMBR(entity1, graph);
+	int time = clock() - start;
+	start = clock();
+	GenerateRMBRByQueue(entity2, graph);
+	time = clock() - start;
+
+	EntityInSCC_To_Disk(entity1, m_range, "Real_Data/citeseer/entity1.txt");
+	EntityInSCC_To_Disk(entity1, m_range, "Real_Data/citeseer/entity2.txt");
+
+	for (int i = 0; i < entity1.size(); i++)
 	{
-		m_entity[i].RMBR.left_bottom.x = -1;
-		m_entity[i].RMBR.left_bottom.y = -1;
-		m_entity[i].RMBR.right_top.x = -1;
-		m_entity[i].RMBR.right_top.y = -1;
+		if (abs(entity1[i].RMBR.left_bottom.x - entity2[i].RMBR.left_bottom.x) > 0.00000001)
+		{
+			CString str;
+			str.Format(TEXT("%d left_bottom.x"), i);
+			MessageBox(str);
+		}
+		if (abs(entity1[i].RMBR.left_bottom.y - entity2[i].RMBR.left_bottom.y) > 0.00000001)
+		{
+			CString str;
+			str.Format(TEXT("%d left_bottom.y"), i);
+			MessageBox(str);
+		}
+		if (abs(entity1[i].RMBR.right_top.x - entity2[i].RMBR.right_top.x) > 0.00000001)
+		{
+			CString str;
+			str.Format(TEXT("%d right_top.x"), i);
+			MessageBox(str);
+		}
+		if (abs(entity1[i].RMBR.right_top.y - entity2[i].RMBR.right_top.y) > 0.00000001)
+		{
+			CString str;
+			str.Format(TEXT("%d right_top.y"), i);
+			MessageBox(str);
+		}
 	}
-	GenerateRMBR(m_entity, graph_set);
-	EntityInSCCSeperate_To_Disk(m_entity, m_range, "RMBR/18_16/new_seperate");
 }
 
  
@@ -1042,7 +1072,7 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRmbr()
 
 	//vector<Entity> entity;
 	GenerateEntity(node_count, m_entity, m_range, 0.4);
-	EntityToDIsk(m_entity, m_range, path + "entity.txt");
+	EntityToDisk(m_entity, m_range, path + "entity.txt");
 
 	
 	//vector<vector<int>> graph;
@@ -1264,25 +1294,59 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRead()
 
 void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonDagGenerate()
 {
-	
-	m_node_count = pow(2, 18);
-	int ratio = 10;
-	m_edge_count = ratio * m_node_count;
-	vector<set<int>> dag;
-	m_path = "RMBR/DAG/18_10";
-
-	GenerateDAG(dag, m_node_count, m_edge_count);
-	ArbitaryGraphToDisk(dag, m_path + "/dag.txt");
-
-	//ReadArbitaryGraphFromDisk(dag, m_node_count, m_path + "dag.txt");
-	for (int i = 0; i < m_node_count; i++)
+	/*
+	for (int k = 5; k < 9; k++)
 	{
-		vector<int> current_tran = GetTransitiveClosureLineArbitary(i, dag);
-		TransitiveClosureLine_To_Disk(current_tran, i, m_path + "/transitive_closure.txt", m_node_count);
+		m_node_count = pow(2, 18);
+		int ratio = k;
+		m_edge_count = ratio * m_node_count;
+		vector<set<int>> dag;
+		m_path = "RMBR/DAG/18_"+getstring(ratio)+"/";
+
+		GenerateDAG(dag, m_node_count, m_edge_count);
+		ArbitaryGraphToDisk(dag, m_path + "/dag.txt");
+
+		//ReadArbitaryGraphFromDisk(dag, m_node_count, m_path + "dag.txt");
+		ofstream ofile(m_path + "transitive_closure.txt", ios::out);
+		ofile.close();
+		for (int i = 0; i < m_node_count; i++)
+		{
+			vector<int> current_tran = GetTransitiveClosureLineArbitary(i, dag);
+			TransitiveClosureLine_To_Disk(current_tran, i, m_path + "/transitive_closure.txt", m_node_count);
+		}
+		GenerateEntityInSCC(m_node_count, m_entity, 1000, 0.4);
+		GenerateRMBR(m_entity, dag);
+		EntityInSCCSeperate_To_Disk(m_entity, 1000, m_path);
 	}
-	GenerateEntityInSCC(m_node_count, m_entity,1000, 0.4);
-	GenerateRMBR(m_entity, dag);
-	EntityInSCCSeperate_To_Disk(m_entity, 1000, m_path);
+	*/
+	
+	string m_path = "Real_Data/Patents";
+	m_nonspatial_ratio = 0.8;
+	//hash_map<int, int> id_index;
+	vector<vector<int>> real_graph;
+	
+	
+	//ReadID(id_index, m_path + "/entity_id.txt");
+	//ReadArbitaryGraphFromDisk(real_graph, id_index, m_path + "/edgelist.txt", 5);
+	ReadGraphFromEdge(real_graph, m_node_count, m_path + "/edgelist.txt", 5);
+
+	
+	//m_node_count = real_graph.size();
+	m_range = 1000;
+
+	//ArbitaryGraphEdgeToDisk(real_graph, m_path + "/transform/edgelist.txt");
+
+	GenerateEntityInSCC(m_node_count, m_entity, m_range, m_nonspatial_ratio);
+	GenerateRMBR(m_entity, real_graph);
+	EntityInSCCSeperate_To_Disk(m_entity, m_range, m_path + "/Random_spatial_distributed/80");
+
+	/*for (int i = 0; i < m_node_count; i++)
+	{
+		vector<int> trans = GetTransitiveClosureLine(i, real_graph);
+		TransitiveClosureLine_To_Disk(trans, i, m_path + "/transform/transitive_closure.txt", m_node_count);
+	}*/
+
+
 
 }
 
@@ -1305,4 +1369,701 @@ void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonEntity()
 	GenerateRMBR(m_entity, dag);
 
 	EntityInSCCSeperate_To_Disk(m_entity, m_range, "RMBR/DAG/18_4");
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRandomgraphGenerate()
+{
+	vector<set<int>> graph_entity, SCC, graph_SCC;
+	for (int k = 6;k<11 ; k++)
+	{
+		m_range = 1000;
+		m_node_count = pow(2, 18);
+		int ratio = k;
+		m_edge_count = ratio * m_node_count;
+		
+		m_path = "RMBR/18_" + getstring(ratio);
+		
+		
+		//GenerateArbitaryGraph(graph_entity, m_node_count, m_edge_count);
+		//ArbitaryGraphToDisk(graph_entity, m_path + "/graph_entity.txt");
+
+		/*
+		for (int i = 0; i < m_node_count; i++)
+		{
+			graph_entity[i].clear();
+		}
+		graph_entity.clear();*/
+		
+		ReadArbitaryGraphFromDisk(graph_entity, m_node_count, m_path + "/graph_entity.txt");
+
+		ReadSCC(SCC, m_path + "/SCC.txt");
+
+		GenerateEntityInSCC(m_node_count, m_entity, m_range, 0.4);
+		ConnectSCCEntity(m_entity, SCC);
+
+		GenerateRMBR(m_entity, graph_entity);
+
+		EntityInSCCSeperate_To_Disk(m_entity, m_range, m_path);
+
+		graph_SCC.resize(SCC.size());
+
+		GenerateSCCGraph(m_entity, graph_entity, graph_SCC);
+
+		ArbitaryGraphToDisk(graph_SCC, m_path + "/graph_SCC.txt");
+		
+	
+
+		//ReadArbitaryGraphFromDisk(graph_SCC, m_node_count, m_path + "/graph_SCC.txt");
+
+		for (int i = 0; i < m_node_count; i++)
+		{
+			vector<int> transitive_closure = GetTransitiveClosureLineArbitary(i, graph_SCC);
+			TransitiveClosureLine_To_Disk(transitive_closure, i, m_path + "/transitive_closure.txt", m_node_count);
+		}
+
+		for (int i = 0; i < m_node_count; i++)
+		{
+			graph_entity[i].clear();
+		}
+		graph_entity.clear();
+
+		for (int i = 0; i < SCC.size(); i++)
+		{
+			SCC[i].clear();
+			graph_SCC[i].clear();
+		}
+		SCC.clear();
+		graph_SCC.clear();
+		m_entity.clear();
+	}
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonRealdataGenerate()
+{
+	//string m_path = "Real_Data/WikiTalk";
+	vector<string> filename;
+	//filename.push_back("citeseer");
+	//filename.push_back("citeseerx");
+	//filename.push_back("go_uniprot");
+	//filename.push_back("uniprotenc_22m");
+	//filename.push_back("uniprotenc_100m");
+	//filename.push_back("uniprotenc_150m");
+	filename.push_back("Patents");
+
+	TRnd Rnd = time(0);
+	int testingcount = 1000;
+
+	for (int i = 0; i < filename.size(); i++)
+	{
+		string m_path = "Real_Data/" + filename[i];
+		vector<vector<int>> real_graph;
+
+		ReadArbitaryGraphFromDisk(real_graph, m_node_count, m_path + "/graph.txt");
+		int start = clock();
+		double total_count = 0;
+		//for (int j = 0; j < testingcount; j++)
+		vector<int> trans;
+		int id = 225232;
+		
+		//int id = Rnd.GetUniDev()*m_node_count;
+		trans = GetTransitiveClosureLineArbitary(id, real_graph);
+		//total_count += trans.size();
+		//TransitiveClosureLine_To_Disk(trans, i, m_path + "/transitive_closure.txt", m_node_count);
+		
+		int time = clock() - start;
+		//ofstream file("data/Real_Data/"+filename[i]+"/average_transitive_size.txt", ios::app);
+		ofstream file("data/Real_Data/" + filename[i] + "/reachable_vertices.csv");
+		//file << " building transitive closure time: " << time;
+		//file << testingcount << "\t" << total_count / testingcount;
+		file << trans.size() << endl;
+		for (int j = 0; j < trans.size(); j++)
+			file << trans[j] << "\t";
+		file << endl;
+		
+		file.close();
+	}
+	
+
+	
+
+	//ReadArbitaryGraphFromDisk(real_graph, m_node_count, m_path + "/SCC_Graph.txt");
+	//ReadGraphFromEdge(real_graph, m_node_count, m_path + "/edgelist.txt",5);
+	/*
+	//ReadID(id_index, m_path + "/entity_id.txt");
+	//ReadArbitaryGraphFromDisk(real_graph, id_index, m_path + "/edgelist.txt", 5);
+	ReadGraphFromEdge(real_graph, m_node_count, m_path + "/WikiTalk.txt", 3);
+	//ArbitaryGraphToDisk(real_graph, m_path + "/graph_entity.txt");
+
+	vector<set<int>> SCC;
+	ReadSCC(SCC, m_path + "/SCC.txt");
+
+	//m_node_count = real_graph.size();
+	m_range = 1000;
+
+	//ArbitaryGraphEdgeToDisk(real_graph, m_path + "/transform/edgelist.txt");
+
+	GenerateEntityInSCC(m_node_count, m_entity, m_range, m_nonspatial_ratio);
+	ConnectSCCEntity(m_entity, SCC);
+
+	vector<set<int>> SCC_Graph;
+	SCC_Graph.resize(SCC.size());
+	GenerateSCCGraph(m_entity, real_graph, SCC_Graph);
+	ArbitaryGraphToDisk(SCC_Graph, m_path + "/SCC_Graph.txt");*/
+
+
+	
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGenEntity()
+{
+	vector<pair<string, int>> graphs;
+	graphs.push_back(make_pair("citeseer", 693947));
+	graphs.push_back(make_pair("citeseerx", 6540401));
+	graphs.push_back(make_pair("go_uniprot", 6967956));
+	graphs.push_back(make_pair("Patents", 3774768));
+	graphs.push_back(make_pair("uniprotenc_22m", 1595444));
+	graphs.push_back(make_pair("uniprotenc_100m", 16087295));
+	graphs.push_back(make_pair("uniprotenc_150m", 25037600));
+	//graphs.push_back(make_pair("uniprotenc_100m_new", 16087295));
+
+	m_range = 1000;
+	vector<set<int>> graph;
+
+	ofstream ofile("data/Real_Data/RMBR_construct_time_new.txt", ios::app);
+
+	//for (int j = 0; j < graphs.size(); j++)
+	int j = 3;
+	{
+		graph.clear();
+		m_path = "Real_Data/" + graphs[j].first;
+		m_node_count = graphs[j].second;
+
+		ofile << graphs[j].first << endl;
+		ofile << "ratio\t" << "RMBR_size\n";
+		ReadArbitaryGraphFromDisk(graph, m_node_count, m_path + "/graph.txt");
+		for (int times = 0; times < 10; times++)
+		{
+			for (int i = 20; i < 100; i += 20)
+			{
+				m_nonspatial_ratio = i / 100.0;
+				m_entity.clear();
+				//GenerateEntityInSCC(m_node_count, m_entity, m_range, m_nonspatial_ratio);
+				//GenerateRMBR(m_entity, graph);
+				ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, m_path + "/Random_spatial_distributed/" + getstring(i) + "/entity.txt");
+				/*long size = 0;
+				for (int k = 0; k < m_entity.size(); k++)
+				{
+					if (abs(m_entity[k].RMBR.left_bottom.x + 1) < 0.000000001)
+						continue;
+					double x = m_entity[k].RMBR.left_bottom.x;
+					size += sizeof(x) * 4;
+				}
+				ofile << i << "\t" << size << endl;*/
+				long start = clock();
+				GenerateRMBR(m_entity, graph);
+				long time = clock() - start;
+				ofile << i << "\t" << time << endl;
+				//EntityInSCC_To_Disk(m_entity, m_range, m_path + "/Random_spatial_distributed/" + getstring(i) + "/entity.txt");
+			}
+			ofile << endl;
+		}
+		
+	}
+	ofile.close();
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonSpatialTran()
+{
+	string m_path = "Real_Data/Patents";
+	m_node_count = 3774768;
+
+	vector<vector<int>> tran;
+	ReadTransitiveClosureFromDisk(tran, m_node_count, m_path + "/transitive_closure.txt");
+
+	for (int i = 20; i < 100; i += 20)
+	{
+		string entity_path = m_path + "/Random_spatial_distributed/" + getstring(i);
+		string spatial_tran_path = "data/Real_Data/Patents/Random_spatial_distributed/" + getstring(i) + "/spatial_transitive_closure.txt";
+		m_entity.clear();
+		ReadEntityInSCCSeperateFromDisk(m_node_count, m_entity, m_range, entity_path);
+		
+		
+		char *ch = (char*)spatial_tran_path.data();
+		freopen(ch, "w", stdout);
+		for (int j = 0; j < m_node_count; j++)
+		{
+			vector<int> line;
+			line.reserve(tran[j].size());
+			for (int k = 0; k < tran[j].size(); k++)
+			{
+				int end_id = tran[j][k];
+				if (m_entity[end_id].IsSpatial)
+					line.push_back(end_id);
+			}
+			printf("%d %d ", j, line.size());
+			for (int k = 0; k < line.size(); k++)
+				printf("%d ", line[k]);
+			printf("\n");
+		}
+		fclose(stdout);
+	}
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonTransform()
+{
+	vector<string> filename;
+	//filename.push_back("test.txt");
+	//filename.push_back("citeseer");
+	//filename.push_back("citeseerx");
+	//filename.push_back("go_uniprot");
+	//filename.push_back("uniprotenc_22m");
+	//filename.push_back("uniprotenc_100m");
+	//filename.push_back("uniprotenc_150m");
+
+	string infilepath = "D:/grail-master/grail-master/Downloads";
+
+	for (int i = 0; i < filename.size(); i++)
+	{
+		string path = infilepath + "/" + filename[i] + ".txt";
+		char* ch = (char*)path.data();
+		freopen(ch, "r", stdin);
+		string line;
+		SSIZE_T read;
+		if(!getline(cin, line))
+			MessageBox(_T("format mismatch"), _T("Error"), MB_OK);
+		scanf("%d\n", &m_node_count);
+
+		vector<set<int>> graph;
+		graph.resize(m_node_count);
+
+		while (getline(cin, line))
+		{
+			int index = line.find(':');
+			string start_str = line.substr(0, index);
+			int start = atoi((char*)start_str.data());
+			line = line.substr(index + 2, line.length());
+
+			if (line.length() == 1)
+				continue;
+			else
+			{
+				while (true)
+				{
+					index = line.find(' ');
+					if (index == -1)
+						break;
+					else
+					{
+						string end_str = line.substr(0, index);
+						int end = atoi((char*)end_str.data());
+						graph[start].insert(end);
+						line = line.substr(index + 1, line.length());
+					}
+				}
+			}
+		}
+		fclose(stdin);
+
+		string outfilename = "Real_Data/" + filename[i] + "/graph.txt";
+		ArbitaryGraphToDisk(graph, outfilename);
+
+		for (int j = 0; j < m_node_count; j++)
+		{
+			graph[j].clear();
+		}
+		graph.clear();
+	}
+}
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonGraphTransform()
+{
+	string path = "Real_Data/Patents";
+	
+	//ArbitaryGraphToDisk(graph, path + "/graph.txt");
+	vector<vector<int>> graph;
+	ReadArbitaryGraphFromDisk(graph, m_node_count, path + "/graph.txt");
+
+	/*for (int i = 0; i < graph.size(); i++)
+	{
+		for (int j = 0; j < graph[i].size(); j++)
+		{
+			if (i == graph[i][j])
+			{
+				CString str;
+				str.Format(_T("%d"), i);
+				MessageBox(str);
+			}
+		}
+	}*/
+
+	int edge_count = 0;
+	for (int i = 0; i < graph.size(); i++)
+	{
+		edge_count += graph[i].size();
+	}
+
+	string w_path = "data/" + path + "/graph_PrunedLabel.txt";
+	char *ch = (char*)w_path.data();
+	freopen(ch, "w", stdout);
+	printf("%d %d\n", graph.size(), edge_count);
+	for (int i = 0; i < graph.size(); i++)
+	{
+		if (graph[i].size() != 0)
+		{
+			printf("%d", graph[i][0] + 1);
+			for (int j = 1; j < graph[i].size(); j++)
+			{
+				printf(" %d", graph[i][j] + 1);
+			}
+		}
+		printf("\n");
+	}
+	fclose(stdout);
+	/*for (int i = 0; i < graph.size(); i++)
+	{
+		if (graph[i].size() != 0)
+		{
+			set<int>::iterator iter = graph[i].begin();
+			printf("%d", *iter);
+			set<int>::iterator end = graph[i].end();
+			iter++;
+			while (iter != end)
+			{
+				printf(" %d", *iter);
+				iter++;
+			}
+		}
+		printf("\n");
+	}
+	fclose(stdout);*/
+}
+
+
+
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtonReserseTransform()
+{
+	ifstream infile("D:/PrunedLabeling-master/PrunedLabeling-master/sample.graph");
+	string line;
+	int V, E;
+	stringstream ss;
+	getline(infile, line);
+	ss << line;
+	ss >> V >> E;
+
+	vector<vector<int> > G(V);
+
+	for (int i = 0; i < V; i++) {
+		stringstream ss;
+		int n;
+		getline(infile, line);
+		ss << line;
+
+		while (ss >> n) {
+			n--;
+			G[i].push_back(n);
+		}
+	}
+
+	infile.close();
+
+	/*for (int i = 0; i < G.size(); i++)
+	{
+		vector<int> tranline = GetTransitiveClosureLineArbitary(i, G);
+		TransitiveClosureLine_To_Disk(tranline, i, "Real_Data/Patents/tran_sample.txt", 1000);
+	}*/
+	ArbitaryGraphToDisk(G, "Real_Data/Patents/sample/samplegraph.txt");
+}
+
+void GenerateGridIndex()
+{
+	vector<string> filename;
+	//filename.push_back("Patents");
+	//filename.push_back("citeseerx");
+	//filename.push_back("go_uniprot");
+	filename.push_back("uniprotenc_22m");
+	//filename.push_back("uniprotenc_100m");
+	//filename.push_back("uniprotenc_150m");
+
+	for (int fileindex = 0; fileindex < filename.size(); fileindex++)
+	{
+		string datasource = filename[fileindex];
+
+		ReadArbitaryGraphFromDisk(m_graph_v, m_node_count, "Real_Data/" + datasource + "/graph.txt");
+
+		//get in-edge graph
+		vector<vector<int>> in_edge_graph;
+		in_edge_graph.resize(m_node_count);
+		for (int i = 0; i < m_node_count; i++)
+		{
+			for (int j = 0; j < m_graph_v[i].size(); j++)
+			{
+				int neighbor = m_graph_v[i][j];
+				in_edge_graph[neighbor].push_back(i);
+			}
+		}
+
+		Location l1;
+		l1.x = 0;
+		l1.y = 0;
+		Location l2;
+		l2.x = 1000;
+		l2.y = 1000;
+		int pieces = 128;
+		int grid_count = pieces*pieces;
+		//vector<set<int>> index1;
+		vector<vector<bool>> index1;
+		index1.resize(m_node_count);
+		//vector<vector<bool>> update;
+		//vector<set<int>> update;
+		//vector<vector<int>> update;
+		//update.resize(m_node_count);
+		for (int i = 0; i < m_node_count; i++)
+		{
+			//update[i].resize(grid_count);
+			index1[i].resize(grid_count);
+		}
+
+		//for (int ratio = 20; ratio <= 80; ratio += 20)
+		int ratio = 80;
+		{
+			for (int i = 0; i < m_node_count; i++)
+			{
+				for (int j = 0; j < grid_count; j++)
+				{
+					index1[i][j] = false;
+					//update[i][j] = false;
+				}
+			}
+			ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, "Real_Data/" + datasource + "/Random_spatial_distributed/" + getstring(ratio) + "/entity.txt");
+			int start = clock();
+			//GenerateGridPointIndex(l1, l2, pieces, pieces, m_graph_v, in_edge_graph, m_entity, index1, update);
+			GenerateGridPointIndex(l1, l2, pieces, pieces, m_graph_v, m_entity, index1);
+			//GenerateGridPointIndexNotInQueue(l1, l2, pieces, pieces, m_graph_v, m_entity, index1);
+			int time = clock() - start;
+			ofstream ofile("data/Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/construction_time.txt", ios::app);
+			ofile << ratio << "\tWithout Update" << '\t' << time << endl;
+			//ofile << ratio << "\tWith Update vector bool" << '\t' << time << endl;
+			//ofile << ratio << "\tWith Update vector" << '\t' << time << endl;
+			ofile.close();
+
+			INT64 count = 0;
+			//for (int i = 0; i < index1.size(); i++)
+			//count += index1[i].size();
+			for (int i = 0; i < index1.size(); i++)
+			{
+				for (int j = 0; j < index1[i].size(); j++)
+				{
+					if (index1[i][j])
+					count += 1;
+				}
+			}
+			for (int i = 0; i < index1.size(); i++)
+			{
+				//count += index1[i].size();
+			}
+			ofile.open("data/Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/index_size.txt", ios::app);
+			ofile << ratio << "\t" << count * 4 << endl;
+			ofile.close();
+			//ArbitaryGraphToDisk(index1, "Real_Data/" + datasource + "/GeoReachGrid_5/GeoReachGrid_" + getstring(ratio) + ".txt");
+			GridPointIndexToDisk(index1, "Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/GeoReachGrid_" + getstring(ratio) + ".txt");
+
+		}
+		vector<vector<int>> my_graph;
+		m_graph_v.swap(my_graph);
+	}
+
+
+
+	/*{
+	vector<set<int>> index2;
+	GenerateGridPointIndexNotInQueue(l1, l2, 5, 5, m_graph_v, m_entity, index2);
+	ArbitaryGraphToDisk(index2, "Real_Data/Patents/index_40_noqueue.txt");
+
+	}*/
+
+	/*for (int i = 0; i < index1.size(); i++)
+	{
+	if (index1[i].size() != index2[i].size())
+	{
+	CString str;
+	str.Format(TEXT("%d size error"), i);
+	MessageBox(str);
+	}
+	set<int>::iterator end = index2[i].end();
+	for (set<int>::iterator iter = index2[i].begin(); iter != end; iter++)
+	{
+	if (index1[i].find(*iter) == index1[i].end())
+	{
+	CString str;
+	str.Format(TEXT("%d not contain"), i);
+	MessageBox(str);
+	}
+	}
+
+	}*/
+}
+
+void SortTest()
+{
+	string datasource = "citeseer";
+
+	ReadArbitaryGraphFromDisk(m_graph_v, m_node_count, "Real_Data/" + datasource + "/graph.txt");
+	/*
+	vector<vector<int>> graph;
+	graph.resize(6);
+	graph[4].push_back(5);
+	graph[0].push_back(2);
+	graph[5].push_back(0);
+	graph[4].push_back(0);
+	graph[4].push_back(1);
+	graph[2].push_back(3);
+	graph[3].push_back(1);
+	*/
+	queue<int> queue;
+
+	TopologicalSort(m_graph_v, queue);
+
+	int k = queue.front();
+}
+
+void GenerateGridSequence()
+{
+	vector<string> filename;
+	//filename.push_back("Patents");
+	//filename.push_back("citeseerx");
+	//filename.push_back("go_uniprot");
+	filename.push_back("uniprotenc_22m");
+	//filename.push_back("uniprotenc_100m");
+	//filename.push_back("uniprotenc_150m");
+
+	for (int fileindex = 0; fileindex < filename.size(); fileindex++)
+	{
+		string datasource = filename[fileindex];
+
+		ReadArbitaryGraphFromDisk(m_graph_v, m_node_count, "Real_Data/" + datasource + "/graph.txt");
+
+		//get in-edge graph
+		vector<vector<int>> in_edge_graph;
+		in_edge_graph.resize(m_node_count);
+		for (int i = 0; i < m_node_count; i++)
+		{
+			for (int j = 0; j < m_graph_v[i].size(); j++)
+			{
+				int neighbor = m_graph_v[i][j];
+				in_edge_graph[neighbor].push_back(i);
+			}
+		}
+
+		Location l1;
+		l1.x = 0;
+		l1.y = 0;
+		Location l2;
+		l2.x = 1000;
+		l2.y = 1000;
+		int pieces = 128;
+		int grid_count = pieces*pieces;
+		//vector<set<int>> index1;
+		vector<vector<bool>> index1;
+		index1.resize(m_node_count);
+		//vector<vector<bool>> update;
+		//vector<set<int>> update;
+		//vector<vector<int>> update;
+		//update.resize(m_node_count);
+		for (int i = 0; i < m_node_count; i++)
+		{
+			//update[i].resize(grid_count);
+			index1[i].resize(grid_count);
+		}
+
+		//for (int ratio = 20; ratio <= 80; ratio += 20)
+		int ratio = 40;
+		{
+			for (int i = 0; i < m_node_count; i++)
+			{
+				for (int j = 0; j < grid_count; j++)
+				{
+					index1[i][j] = false;
+					//update[i][j] = false;
+				}
+			}
+			queue<int> queue;
+			ReadEntityInSCCFromDisk(m_node_count, m_entity, m_range, "Real_Data/" + datasource + "/Random_spatial_distributed/" + getstring(ratio) + "/entity.txt");
+			int start = clock();
+			TopologicalSort(m_graph_v, queue);
+			GenerateGridIndexSequence(l1, l2, pieces, pieces, in_edge_graph, m_entity, index1, queue);
+			int time = clock() - start;
+			ofstream ofile("data/Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/construction_time.txt", ios::app);
+			ofile << ratio << "\tWith sort" << '\t' << time << endl;
+			//ofile << ratio << "\tWith Update vector bool" << '\t' << time << endl;
+			//ofile << ratio << "\tWith Update vector" << '\t' << time << endl;
+			ofile.close();
+
+			INT64 count = 0;
+			//for (int i = 0; i < index1.size(); i++)
+			//count += index1[i].size();
+			for (int i = 0; i < index1.size(); i++)
+			{
+				for (int j = 0; j < index1[i].size(); j++)
+				{
+					if (index1[i][j])
+					count += 1;
+				}
+			}
+			for (int i = 0; i < index1.size(); i++)
+			{
+				//count += index1[i].size();
+			}
+			ofile.open("data/Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/index_size.txt", ios::app);
+			ofile << ratio << "\t" << count * 4 << endl;
+			ofile.close();
+			//ArbitaryGraphToDisk(index1, "Real_Data/" + datasource + "/GeoReachGrid_5/GeoReachGrid_" + getstring(ratio) + ".txt");
+			GridPointIndexToDisk(index1, "Real_Data/" + datasource + "/GeoReachGrid_" + getstring(pieces) + "/GeoReachGrid_" + getstring(ratio) + "_sort.txt");
+
+		}
+		vector<vector<int>> my_graph;
+		m_graph_v.swap(my_graph);
+	}
+}
+
+boolean compare(vector<vector<bool>> &index1, vector <vector<bool>> &index2)
+{
+	if (index1.size() != index2.size())
+		return false;
+	if (index1[0].size() != index2[0].size())
+		return false;
+	for (int i = 0; i < index1.size(); i++)
+		for (int j = 0; j < index1[i].size(); j++)
+			if (index1[i][j] != index2[i][j])
+				return false;
+	return true;
+}
+
+void Cgraph_2015_1_24_mfcDlg::OnBnClickedButtongridGenerate()
+{
+	//SortTest();
+	GenerateGridSequence();
+	//GenerateGridIndex();
+	vector<vector<bool>> index1, index2;
+	ReadGridPointIndexFromDisk(128 * 128, index1, "Real_Data/uniprotenc_22m/GeoReachGrid_128/GeoReachGrid_20.txt");
+	ReadGridPointIndexFromDisk(128 * 128, index2, "Real_Data/uniprotenc_22m/GeoReachGrid_128/GeoReachGrid_20_sort.txt");
+	bool result = compare(index1, index2);
+	if (result)
+	{
+		CString str;
+		str.Format(TEXT("true"));
+		MessageBox(str);
+	}
+	else
+	{
+		CString str;
+		str.Format(TEXT("false"));
+		MessageBox(str);
+	}
 }

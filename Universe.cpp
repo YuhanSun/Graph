@@ -89,7 +89,7 @@ void EntityToDisk(Entity Entity_Matrix[], int node_count, int range, string file
 	fclose(stdout);
 }
 
-void EntityToDIsk(vector<Entity> entity_vector, int range, string filename)
+void EntityToDisk(vector<Entity> entity_vector, int range, string filename)
 {
 	string root = "data/";
 	root += filename;
@@ -226,5 +226,13 @@ void ReadEntityFromDisk(int &node_count, vector<Entity> &entity_vector, int &ran
 		scanf("%d %d %lf %lf %d", &(entity_vector[i].id), &(entity_vector[i].IsSpatial), &(entity_vector[i].location.x), &(entity_vector[i].location.y), &(entity_vector[i].type));
 	}
 	fclose(stdin);
+}
+
+string getstring(const int i)
+{
+	stringstream newstr;
+	newstr << i;
+	return newstr.str();
+
 }
 

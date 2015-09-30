@@ -12,10 +12,10 @@ bool RecUnion(MyRect &rect_v, MyRect &rect_neighbour)
 {
 	bool flag = false;
 
-	if (rect_v.left_bottom.x == -1 && rect_neighbour.left_bottom.x == -1)
+	if (rect_v.left_bottom.x < 0 && rect_neighbour.left_bottom.x < 0)
 		return false;
 
-	if (rect_v.left_bottom.x == -1)
+	if (rect_v.left_bottom.x < 0)
 	{
 		rect_v.left_bottom.x = rect_neighbour.left_bottom.x;
 		rect_v.left_bottom.y = rect_neighbour.left_bottom.y;
@@ -24,7 +24,7 @@ bool RecUnion(MyRect &rect_v, MyRect &rect_neighbour)
 		return true;
 	}
 
-	if (rect_neighbour.left_bottom.x == -1)
+	if (rect_neighbour.left_bottom.x < 0)
 		return false;
 
 	if (rect_neighbour.left_bottom.x < rect_v.left_bottom.x)

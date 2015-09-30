@@ -7,12 +7,14 @@ using namespace std;
 #include <vector>
 #include <set>
 #include <hash_set>
+#include <hash_map>
 #include <stack>
 #include <queue>
 #include "Rand.h"
 #include "RTree.h"
 #include <iterator>
 #include <time.h>
+#include <sstream>
 
 struct Location
 {
@@ -75,7 +77,7 @@ bool Location_In_Rect(Location m_location, MyRect m_rect);
 
 //Outfile entity to disk for storage
 void EntityToDisk(Entity Entity_Matrix[], int node_count, int range, string filename);
-void EntityToDIsk(vector<Entity> entity_vector, int range, string filename);
+void EntityToDisk(vector<Entity> entity_vector, int range, string filename);
 
 //Out file entity to disk for displaying
 void OutFile(Entity Entity_Matrix[], int node_count, string filename);
@@ -89,5 +91,7 @@ void GenerateEntity(int node_count, vector<Entity> &entity_vector, int range, do
 //Read entity from disk storage
 void ReadEntityFromDisk(int &node_count, Entity Entity_Matrix[], int &range,string filename);
 void ReadEntityFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
+
+string getstring(const int i);
 
 #endif

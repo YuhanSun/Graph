@@ -17,6 +17,31 @@ void ReadGraphFromEdge(vector<set<int>> &graph, string filename)
 		else
 			break;
 	}
+	fclose(stdin);
+}
+
+void ReadGraphFromEdge(vector<vector<int>> &graph, int &node_count, string filename, int average_degree)
+{
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d", &node_count);
+	graph.resize(node_count);
+
+	for (int i = 0; i < node_count; i++)
+		graph[i].reserve(3 * average_degree);
+	int start, end;
+	while (true)
+	{
+		int count = scanf("%d %d", &start, &end);
+		if (count == 2)
+			graph[start].push_back(end);
+		else
+			break;
+	}
+	fclose(stdin);
 }
 
 void ReadSCC(vector<set<int>> &SCC, string filename)
@@ -50,6 +75,7 @@ void ReadSCC(vector<set<int>> &SCC, string filename)
 		i++;
 		c = getchar();
 	}
+	fclose(stdin);
 }
 
 void ConnectSCCEntity(vector<Entity> &entity, vector<set<int>> &SCC)
@@ -251,6 +277,21 @@ void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, strin
 	fclose(stdout);
 }
 
+void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename)
+{
+	string root = "data/";
+	root += filename;
+	char *ch1 = (char *)root.data();
+	freopen(ch1, "w", stdout);
+
+	printf("%d %d\n", entity_vector.size(), range);
+	for (int i = 0; i < entity_vector.size(); i++)
+	{
+		printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
+	}
+	fclose(stdout);
+}
+
 void AddEdge(vector<set<int>> &graph, int start, int end)
 {
 	graph[start].insert(end);
@@ -398,6 +439,25 @@ void ArbitaryGraphToDisk(vector<vector<int>> &graph, string filename)
 	fclose(stdout);
 }
 
+void ArbitaryGraphEdgeToDisk(vector<vector<int>> &graph, string filename)
+{
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "w", stdout);
+
+	printf("%d\n", graph.size());
+	for (int i = 0; i < graph.size(); i++)
+	{
+		for (int j = 0; j < graph[i].size(); j++)
+		{
+			printf("%d %d", i, graph[i][j]);
+			printf("\n");
+		}	
+	}
+	fclose(stdout);
+}
+
 void ReadArbitaryGraphFromDisk(vector<set<int>> &graph, int &node_count, string filename)
 {
 	string root = "data/";
@@ -475,6 +535,68 @@ void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph)
 					changed |= RecUnion(p_entity[i].RMBR, rec);
 				}
 				changed |= RecUnion(p_entity[i].RMBR, p_entity[neibour_id].RMBR);
+			}
+		}
+	}
+}
+
+void GenerateRMBRByQueue(vector<Entity> &p_entity, vector<set<int>> &p_graph)
+{
+	vector<vector<int>> in_edge_graph;
+	in_edge_graph.resize(p_graph.size());
+	for (int i = 0; i < p_graph.size(); i++)
+	{
+		set<int>::iterator end = p_graph[i].end();
+		for (set<int>::iterator iter = p_graph[i].begin(); iter != end; iter++)
+		{
+			in_edge_graph[*iter].push_back(i);
+		}
+	}
+	
+	hash_set<int> hashset;
+	queue<int> queue;
+	for (int i = 0; i < p_entity.size(); i++)
+	{
+		p_entity[i].RMBR.left_bottom.x = -1;
+		p_entity[i].RMBR.left_bottom.y = -1;
+		p_entity[i].RMBR.right_top.x = -1;
+		p_entity[i].RMBR.right_top.y = -1;
+
+		if (p_entity[i].IsSpatial)
+		{
+			queue.push(i);
+			hashset.insert(i);
+		}
+	}
+	while (!queue.empty())
+	{
+		int id = queue.front();
+		queue.pop();
+		hashset.erase(id);
+		for (int i = 0; i < in_edge_graph[id].size(); i++)
+		{
+			boolean changed = false;
+			int in_neighbor = in_edge_graph[id][i];
+			
+			if (p_entity[id].IsSpatial)
+			{
+				MyRect rec;
+				rec.left_bottom.x = p_entity[id].location.x;
+				rec.left_bottom.y = p_entity[id].location.y;
+				rec.right_top.x = p_entity[id].location.x;
+				rec.right_top.y = p_entity[id].location.y;
+
+				changed |= RecUnion(p_entity[in_neighbor].RMBR, rec);
+			}
+			changed |= RecUnion(p_entity[in_neighbor].RMBR, p_entity[id].RMBR);
+
+			if (changed)
+			{
+				if (hashset.find(in_neighbor) == hashset.end())
+				{
+					hashset.insert(in_neighbor);
+					queue.push(in_neighbor);
+				}
 			}
 		}
 	}
@@ -806,6 +928,26 @@ void TraverseArbitary(int id, vector<set<int>> &graph, vector<bool> &isvisted, v
 			isvisted[out_id] = true;
 			reach_vertices.push_back(out_id);
 			TraverseArbitary(out_id, graph, isvisted, reach_vertices);
+		}
+	}
+}
+
+void ReadTransitiveClosureFromDisk(vector<vector<int>> &transitive_closure, int node_count, string filepath)
+{
+	string m_path = "data/" + filepath;
+	char* ch = (char*)m_path.data();
+	freopen(ch, "r", stdin);
+	transitive_closure.resize(node_count);
+	for (int i = 0; i < node_count; i++)
+	{
+		int start_id, count;
+		scanf("%d %d ", &start_id, &count);
+		transitive_closure[i].reserve(count);
+		for (int j = 0; j < count; j++)
+		{
+			int end_id;
+			scanf("%d ", &end_id);
+			transitive_closure[i].push_back(end_id);
 		}
 	}
 }

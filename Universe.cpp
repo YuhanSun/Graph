@@ -228,11 +228,229 @@ void ReadEntityFromDisk(int &node_count, vector<Entity> &entity_vector, int &ran
 	fclose(stdin);
 }
 
+void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename)
+{
+	string root = "data/";
+	root += filename;
+	char *ch = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d %d", &node_count, &range);
+	entity_vector.resize(node_count);
+	for (int i = 0; i < node_count; i++)
+	{
+		scanf("%d %d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[i].id), &(entity_vector[i].IsSpatial), &(entity_vector[i].location.x), &(entity_vector[i].location.y), &(entity_vector[i].type), &(entity_vector[i].scc_id), &(entity_vector[i].RMBR.left_bottom.x), &(entity_vector[i].RMBR.left_bottom.y), &(entity_vector[i].RMBR.right_top.x), &(entity_vector[i].RMBR.right_top.y));
+	}
+	fclose(stdin);
+}
+
+void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename)
+{
+	string root = "data/";
+	root += (filename + "/spatial_entity.txt");
+	char *ch = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d %d", &node_count, &range);
+	entity_vector.resize(node_count);
+	while (true)
+	{
+		int id;
+		int count = scanf("%d ", &id);
+		entity_vector[id].id = id;
+		if (count != 1)
+			break;
+		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+	}
+	fclose(stdin);
+
+	root = "data/";
+	root += (filename + "/nonspatial_entity.txt");
+	char *ch2 = (char *)root.data();
+	freopen(ch, "r", stdin);
+
+	scanf("%d %d", &node_count, &range);
+	while (true)
+	{
+		int id;
+		int count = scanf("%d ", &id);
+		entity_vector[id].id = id;
+		if (count != 1)
+			break;
+		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+	}
+	fclose(stdin);
+}
+
+void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename)
+{
+	string root = "data/";
+	root += (filename + "/spatial_entity.txt");
+	char *ch1 = (char *)root.data();
+	freopen(ch1, "w", stdout);
+
+	printf("%d %d\n", entity_vector.size(), range);
+	for (int i = 0; i < entity_vector.size(); i++)
+	{
+		if (entity_vector[i].IsSpatial)
+			printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
+	}
+	fclose(stdout);
+
+	root = "data/";
+	root += (filename + "/nonspatial_entity.txt");
+	char *ch2 = (char *)root.data();
+	freopen(ch2, "w", stdout);
+
+	printf("%d %d\n", entity_vector.size(), range);
+	for (int i = 0; i < entity_vector.size(); i++)
+	{
+		if (!entity_vector[i].IsSpatial)
+			printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
+	}
+	fclose(stdout);
+}
+
+void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename)
+{
+	string root = "data/";
+	root += filename;
+	char *ch1 = (char *)root.data();
+	freopen(ch1, "w", stdout);
+
+	printf("%d %d\n", entity_vector.size(), range);
+	for (int i = 0; i < entity_vector.size(); i++)
+	{
+		printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
+	}
+	fclose(stdout);
+}
+
+void EntityInSCCToNewFormat(int &node_count, vector<Entity> &entity_vector, int &range, string filename, string newfilename)
+{
+	ReadEntityInSCCFromDisk(node_count, entity_vector, range, filename);
+	string root = "data/";
+	root += newfilename;
+	char *ch1 = (char *)root.data();
+	freopen(ch1, "w", stdout);
+
+	printf("%d\n", entity_vector.size());
+	for (int i = 0; i < entity_vector.size(); i++)
+	{
+		printf("%d,%d", i, entity_vector[i].IsSpatial);
+		if (entity_vector[i].IsSpatial)
+			printf(",%lf,%lf\n", entity_vector[i].location.x, entity_vector[i].location.y);
+		else
+			printf("\n");
+	}
+	fclose(stdout);
+}
+
+
 string getstring(const int i)
 {
 	stringstream newstr;
 	newstr << i;
 	return newstr.str();
-
 }
 
+int StringtoInt(string str)
+{
+	return atoi(str.c_str());
+}
+
+vector<string> split(string str, string pattern)
+{
+	vector<string> ret;
+	if (pattern.empty()) return ret;
+	size_t start = 0, index = str.find_first_of(pattern, 0);
+	while (index != str.npos)
+	{
+		if (start != index)
+			ret.push_back(str.substr(start, index - start));
+		start = index + 1;
+		index = str.find_first_of(pattern, start);
+	}
+	if (!str.substr(start).empty())
+		ret.push_back(str.substr(start));
+	return ret;
+}
+
+// A recursive function used by topologicalSort
+void TopologicalSortUtil(int v, vector<bool> &visited, queue<int> &queue, vector<vector<int>> &graph)
+{
+	// Mark the current node as visited.
+	visited[v] = true;
+
+	// Recur for all the vertices adjacent to this vertex
+	for (int i = 0; i < graph[v].size(); i++)
+		if (!visited[graph[v][i]])
+			TopologicalSortUtil(graph[v][i], visited, queue, graph);
+
+	// Push current vertex to stack which stores result
+	queue.push(v);
+}
+
+// The function to do Topological Sort. It uses recursive topologicalSortUtil()
+void TopologicalSort(vector<vector<int>> &graph, queue<int> &queue)
+{
+	// Mark all the vertices as not visited
+	vector<bool> visited = vector<bool>(graph.size());
+
+	for (int i = 0; i < graph.size(); i++)
+		visited[i] = false;
+
+	// Call the recursive helper function to store Topological Sort
+	// starting from all vertices one by one
+	for (int i = 0; i < graph.size(); i++)
+		if (visited[i] == false)
+			TopologicalSortUtil(i, visited, queue, graph);
+}
+
+void GenerateInedgeGraph(vector<vector<int>> &graph, vector<vector<int>> &in_edge_graph)
+{
+	int node_count = graph.size();
+	in_edge_graph.resize(node_count);
+	for (int i = 0; i < node_count; i++)
+	{
+		for (int j = 0; j < graph[i].size(); j++)
+		{
+			int neighbor = graph[i][j];
+			in_edge_graph[neighbor].push_back(i);
+		}
+	}
+}
+
+double randomGauss(double mean, double sigma, TRnd &rand)
+{
+	double v1, v2;
+	double s;
+	double x;
+
+	do
+	{
+		v1 = rand.GetUniDev() * 2 - 1;
+		v2 = rand.GetUniDev() * 2 - 1;
+		s = v1*v1 + v2*v2;
+	} while (s >= 1.0);
+
+	x = v1 * sqrt(-2. * log(s) / s);
+
+	/*  x is normally distributed with mean 0 and sigma 1.  */
+	x = x * sigma + mean;
+
+	return x;
+}
+
+int randomSkewed(int p, double HsubV, TRnd &rand)
+{
+	double r = rand.GetUniDev()*HsubV;
+
+	double sum = 1.0; 
+	int i = 1;
+	while (sum<r){
+		i++;
+		sum += 1.0 / pow((double)i, p);
+	}
+	return i;
+}

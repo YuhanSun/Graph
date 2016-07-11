@@ -8,7 +8,8 @@
 void Initialize_Visited_vertex();
 
 bool RecUnion(MyRect &rect_v, MyRect &rect_neighbour);
-void GenerateRMBR(vector<Entity> &p_entity,vector<vector<int>> &p_graph);
+void GenerateRMBR(vector<Entity> &p_entity,vector<vector<int>> &p_graph);//for graph with edge type
+void GenerateRMBR(vector<Entity> &p_entity, vector<vector<int>> &in_edge_graph, queue<int>& queue);//for graph with edge type
 
 void RMBR_To_Disk(vector<Entity> &p_entity, int range, string filename);
 void ReadRmbr(vector<Entity> &p_entity, int &range, string filename);

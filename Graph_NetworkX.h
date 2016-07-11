@@ -12,10 +12,8 @@ void Traverse(int id, vector<set<int>> &graph, vector<bool> &isvisted, vector<in
 vector<vector<int>> GetTransitiveClosure(vector<set<int>> &graph);
 
 void GenerateEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio);//Generate entity which are randomly selected as spatial nodes and arbitary types
-void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
-void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
-void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename);
-void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename);
+void GenerateZipfEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio);//Generate entity which are randomly selected as spatial nodes and arbitary types with zipf distribution 
+void GenerateClusteredEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio, vector<Location> centers, vector<double> sigmas, vector<double> proportion);//Generate entity which are clustered distributed
 
 void AddEdge(vector<set<int>> &graph, int start, int end);
 void GenerateArbitaryGraph(vector<set<int>> &graph, int node_count, INT64 edge_count);
@@ -26,6 +24,9 @@ void ArbitaryGraphToDisk(vector<vector<int>> &graph, string filename);
 void ArbitaryGraphEdgeToDisk(vector<vector<int>> &graph, string filename);
 void ReadArbitaryGraphFromDisk(vector<set<int>> &graph, int &node_count, string filename);
 void ReadArbitaryGraphFromDisk(vector<vector<int>> &graph, int &node_count, string filename);
+
+//Convert current graph format to new format which is on github
+void GraphToNewformat(vector<vector<int>> &graph, int &node_count, string filename, string newfilename);
 
 void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph);
 void GenerateRMBRByQueue(vector<Entity> &p_entity, vector<set<int>> &p_graph);
@@ -45,5 +46,7 @@ void TraverseArbitary(int id, vector<vector<int>> &graph, vector<bool> &isvisted
 void TraverseArbitary(int id, vector<set<int>> &graph, vector<bool> &isvisted, vector<int> &reach_vertices);
 
 void ReadTransitiveClosureFromDisk(vector<vector<int>> &transitive_closure, int node_count, string filepath);
+
+bool Reach(int src, int end, vector<vector<int>> &graph);
 
 #endif _GRAPH_NETWORKX_H_

@@ -194,102 +194,102 @@ void GenerateEntityInSCC(int node_count, vector<Entity> &entity_vector, int rang
 	}
 }
 
-void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename)
+void GenerateZipfEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio)
 {
-	string root = "data/";
-	root += filename;
-	char *ch = (char *)root.data();
-	freopen(ch, "r", stdin);
-
-	scanf("%d %d", &node_count, &range);
+	TRnd Rnd1 = time(0);
+	Sleep(20000);
+	TRnd Rnd2 = time(0);
+	Sleep(20000);
+	TRnd Rnd3 = time(0);
 	entity_vector.resize(node_count);
+	int spatial_count = 0;
+	int total = node_count * (1 - nonspatial_entity_ratio);
+
 	for (int i = 0; i < node_count; i++)
 	{
-		scanf("%d %d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[i].id), &(entity_vector[i].IsSpatial), &(entity_vector[i].location.x), &(entity_vector[i].location.y), &(entity_vector[i].type), &(entity_vector[i].scc_id), &(entity_vector[i].RMBR.left_bottom.x), &(entity_vector[i].RMBR.left_bottom.y), &(entity_vector[i].RMBR.right_top.x), &(entity_vector[i].RMBR.right_top.y));
+		entity_vector[i].id = i;
+		entity_vector[i].IsSpatial = false;
+
+		entity_vector[i].location.x = -1;
+		entity_vector[i].location.y = -1;
+
+		entity_vector[i].type = 0;
 	}
-	fclose(stdin);
+
+	int i;
+	float HsubV = 0.0;
+	for (i = 1; i <= range*100; i++) {
+		HsubV += 1.0 / pow((double)i, 1);
+	}
+
+	while (true)
+	{
+		int id = Rnd1.GetUniDev()*node_count;
+		if (entity_vector[id].IsSpatial)
+			continue;
+		else
+		{
+			double x = randomSkewed(1, HsubV, Rnd2) / 100.0;
+			double y = randomSkewed(1, HsubV, Rnd3) / 100.0;
+			if (x < range && x>0 && y < range && y>0)
+			{
+				entity_vector[id].IsSpatial = true;
+				entity_vector[id].location.x = x;
+				entity_vector[id].location.y = y;
+				spatial_count++;
+			}
+			
+		}
+		if (spatial_count == total)
+			break;
+	}
 }
 
-void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename)
+void GenerateClusteredEntityInSCC(int node_count, vector<Entity> &entity_vector, int range, double nonspatial_entity_ratio, vector<Location> centers, vector<double> sigmas, vector<double> proportion)
 {
-	string root = "data/";
-	root += (filename + "/spatial_entity.txt");
-	char *ch = (char *)root.data();
-	freopen(ch, "r", stdin);
-
-	scanf("%d %d", &node_count, &range);
 	entity_vector.resize(node_count);
-	while (true)
+
+	for (int i = 0; i < node_count; i++)
 	{
-		int id;
-		int count = scanf("%d ", &id);
-		entity_vector[id].id = id;
-		if (count != 1)
-			break;
-		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+		entity_vector[i].id = i;
+		entity_vector[i].IsSpatial = false;
+
+		entity_vector[i].location.x = -1;
+		entity_vector[i].location.y = -1;
+
+		entity_vector[i].type = 0;
 	}
-	fclose(stdin);
 
-	root = "data/";
-	root += (filename + "/nonspatial_entity.txt");
-	char *ch2 = (char *)root.data();
-	freopen(ch, "r", stdin);
-
-	scanf("%d %d", &node_count, &range);
-	while (true)
+	for (int center_index = 0; center_index < centers.size(); center_index++)
 	{
-		int id;
-		int count = scanf("%d ", &id);
-		entity_vector[id].id = id;
-		if (count != 1)
-			break;
-		scanf("%d %lf %lf %d %d %lf %lf %lf %lf", &(entity_vector[id].IsSpatial), &(entity_vector[id].location.x), &(entity_vector[id].location.y), &(entity_vector[id].type), &(entity_vector[id].scc_id), &(entity_vector[id].RMBR.left_bottom.x), &(entity_vector[id].RMBR.left_bottom.y), &(entity_vector[id].RMBR.right_top.x), &(entity_vector[id].RMBR.right_top.y));
+		Location center = centers[center_index];
+		double sigma = sigmas[center_index];
+		int total_count = node_count* (1 - nonspatial_entity_ratio) *proportion[center_index] + 0.5;
+		TRnd Rnd = time(0);
+		int spatial_count = 0;
+
+		while (true)
+		{
+			int id = Rnd.GetUniDev()*node_count;
+			if (entity_vector[id].IsSpatial)
+				continue;
+			else
+			{
+				
+				double x = randomGauss(center.x, sigma, Rnd);
+				double y = randomGauss(center.y, sigma, Rnd);
+				if (x <= 1000 && x >= 0 && y <= 1000 && y >= 0)
+				{
+					spatial_count++;
+					entity_vector[id].IsSpatial = true;
+					entity_vector[id].location.x = x;
+					entity_vector[id].location.y = y;
+				}	
+			}
+			if (spatial_count == total_count)
+				break;
+		}
 	}
-	fclose(stdin);
-}
-
-void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename)
-{
-	string root = "data/";
-	root += (filename + "/spatial_entity.txt");
-	char *ch1 = (char *)root.data();
-	freopen(ch1, "w", stdout);
-
-	printf("%d %d\n", entity_vector.size(), range);
-	for (int i = 0; i < entity_vector.size(); i++)
-	{
-		if (entity_vector[i].IsSpatial)
-			printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
-	}
-	fclose(stdout);
-
-	root = "data/";
-	root += (filename + "/nonspatial_entity.txt");
-	char *ch2 = (char *)root.data();
-	freopen(ch2, "w", stdout);
-
-	printf("%d %d\n", entity_vector.size(), range);
-	for (int i = 0; i < entity_vector.size(); i++)
-	{
-		if (!entity_vector[i].IsSpatial)
-			printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
-	}
-	fclose(stdout);
-}
-
-void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename)
-{
-	string root = "data/";
-	root += filename;
-	char *ch1 = (char *)root.data();
-	freopen(ch1, "w", stdout);
-
-	printf("%d %d\n", entity_vector.size(), range);
-	for (int i = 0; i < entity_vector.size(); i++)
-	{
-		printf("%d %d %f %f %d %d %lf %lf %lf %lf\n", entity_vector[i].id, entity_vector[i].IsSpatial, entity_vector[i].location.x, entity_vector[i].location.y, entity_vector[i].type, entity_vector[i].scc_id, entity_vector[i].RMBR.left_bottom.x, entity_vector[i].RMBR.left_bottom.y, entity_vector[i].RMBR.right_top.x, entity_vector[i].RMBR.right_top.y);
-	}
-	fclose(stdout);
 }
 
 void AddEdge(vector<set<int>> &graph, int start, int end)
@@ -503,6 +503,26 @@ void ReadArbitaryGraphFromDisk(vector<vector<int>> &graph, int &node_count, stri
 		}
 	}
 	fclose(stdin);
+}
+
+void GraphToNewformat(vector<vector<int>> &graph, int &node_count, string filename, string newfilename)
+{
+	ReadArbitaryGraphFromDisk(graph, node_count, filename);
+	string root = "data/";
+	root += newfilename;
+	char *ch = (char *)root.data();
+	freopen(ch, "w", stdout);
+
+	printf("%d\n", node_count);
+
+	for (int i = 0; i < node_count; i++)
+	{
+		printf("%d,%d", i, graph[i].size());
+		for (int j = 0; j < graph[i].size(); j++)
+			printf(",%d", graph[i][j]);
+		printf("\n");
+	}
+	fclose(stdout);
 }
 
 void GenerateRMBR(vector<Entity> &p_entity, vector<set<int>> &p_graph)
@@ -952,3 +972,34 @@ void ReadTransitiveClosureFromDisk(vector<vector<int>> &transitive_closure, int 
 	}
 }
 
+bool Reach(int src, int end, vector<vector<int>> &graph)
+{
+	if (src == end)
+		return true;
+	vector<bool> isvisited = vector<bool>(graph.size());
+	isvisited[src] = true;
+	queue<int> q;
+	q.push(src);
+	while (!q.empty())
+	{
+		int head = q.front();
+		q.pop();
+		for (int i = 0; i < graph[head].size(); i++)
+		{
+			int out_neighbor = graph[head][i];
+			if (isvisited[out_neighbor])
+				continue;
+			else
+			{
+				if (out_neighbor == end)
+					return true;
+				else
+				{
+					q.push(out_neighbor);
+					isvisited[out_neighbor] = true;
+				}
+			}
+		}
+	}
+	return false;
+}

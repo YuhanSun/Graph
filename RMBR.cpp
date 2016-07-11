@@ -85,6 +85,37 @@ void GenerateRMBR(vector<Entity> &p_entity, vector<vector<int>> &p_graph)
 			}
 		}
 	}
+
+}
+
+void GenerateRMBR(vector<Entity> &p_entity, vector<vector<int>> &in_edge_graph, queue<int>& queue)
+{
+	for (int i = 0; i < p_entity.size(); i++)
+	{
+		p_entity[i].RMBR.left_bottom.x = -1;
+		p_entity[i].RMBR.left_bottom.y = -1;
+		p_entity[i].RMBR.right_top.x = -1;
+		p_entity[i].RMBR.right_top.y = -1;
+	}
+
+	while (!queue.empty())
+	{
+		int id = queue.front();
+		queue.pop();
+
+		if (p_entity[id].IsSpatial)
+		{
+			MyRect rec;
+			rec.left_bottom.x = p_entity[id].location.x;
+			rec.left_bottom.y = p_entity[id].location.y;
+			rec.right_top.x = p_entity[id].location.x;
+			rec.right_top.y = p_entity[id].location.y;
+			for (int i = 0; i < in_edge_graph[id].size(); i++)
+				RecUnion(p_entity[in_edge_graph[id][i]].RMBR, rec);
+		}
+		for (int i = 0; i < in_edge_graph[id].size(); i++)
+			RecUnion(p_entity[in_edge_graph[id][i]].RMBR, p_entity[id].RMBR);
+	}
 }
 
 void RMBR_To_Disk(vector<Entity> &p_entity, int range, string filename)

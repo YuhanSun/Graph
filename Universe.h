@@ -19,12 +19,40 @@ using namespace std;
 struct Location
 {
 	double x, y;
+
+	Location(double a, double b)
+	{
+		x = a;
+		y = b;
+	}
+	Location()
+	{
+		x = 0;
+		y = 0;
+	}
 };
 
 struct MyRect
 {
 	Location left_bottom;
 	Location right_top;
+
+	MyRect(double minx, double miny, double maxx, double maxy)
+	{
+		left_bottom.x = minx;
+		left_bottom.y = miny;
+		right_top.x = maxx;
+		right_top.y = maxy;
+	}
+
+	MyRect()
+	{
+		left_bottom.x = 0;
+		left_bottom.y = 0;
+		right_top.x = 0;
+		right_top.y = 0;
+	}
+
 };
 
 struct Entity
@@ -92,6 +120,27 @@ void GenerateEntity(int node_count, vector<Entity> &entity_vector, int range, do
 void ReadEntityFromDisk(int &node_count, Entity Entity_Matrix[], int &range,string filename);
 void ReadEntityFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
 
+void ReadEntityInSCCFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
+void ReadEntityInSCCSeperateFromDisk(int &node_count, vector<Entity> &entity_vector, int &range, string filename);
+void EntityInSCCSeperate_To_Disk(vector<Entity> &entity_vector, int range, string filename);
+void EntityInSCC_To_Disk(vector<Entity> &entity_vector, int range, string filename);
+
+//Entity to new format
+void EntityInSCCToNewFormat(int &node_count, vector<Entity> &entity_vector, int &range, string filename, string newfilename);
+
 string getstring(const int i);
+int StringtoInt(string str);
+vector<string> split(string str, string pattern);
+
+//Topological sort of dag
+void TopologicalSortUtil(int v, vector<bool> &visited, queue<int> &Queue, vector<vector<int>> &graph);
+void TopologicalSort(vector<vector<int>> &graph, queue<int> &Queue);
+
+//Get in_edge graph
+void GenerateInedgeGraph(vector<vector<int>> &graph, vector<vector<int>> &in_edge_graph);
+
+//GenerateGauss
+double randomGauss(double mean, double sigma, TRnd &rand);
+int randomSkewed(int p, double HsubV, TRnd &rand);
 
 #endif

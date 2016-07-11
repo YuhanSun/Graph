@@ -84,5 +84,7 @@ public:
 	afx_msg void OnBnClickedButtonGraphTransform();
 	afx_msg void OnBnClickedButtonReserseTransform();
 	afx_msg void OnBnClickedButtongridGenerate();
+	afx_msg void OnBnClickedButtonGeoreachGenerate();
 	afx_msg void OnBnClickedButtonGeoreachGraphconvert();
+	afx_msg void OnBnClickedButtonGeoreachEntityconvert();
 };
